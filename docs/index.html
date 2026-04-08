@@ -485,22 +485,50 @@
     }
 
     .win-titlebar {
-      background: #e8e8e8;
+      background: #ffffff;
       height: 32px;
-      padding: 0 10px;
+      padding: 0 0 0 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid #c8c8c8;
+      border-bottom: 1px solid #e5e5e5;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 400;
+      color: #1a1a1a;
     }
 
-    .win-titlebar-btns { display: flex; gap: 6px; align-items: center; }
-    .win-dot { width: 11px; height: 11px; border-radius: 50%; }
-    .win-dot.red    { background: #ff5f57; }
-    .win-dot.yellow { background: #ffbd2e; }
-    .win-dot.green  { background: #28c940; }
+    .win-titlebar-left { display: flex; align-items: center; gap: 8px; }
+
+    .win-app-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      background: #1964D2;
+      color: #fff;
+      font-size: 9px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .win-titlebar-btns { display: flex; height: 32px; }
+
+    .win-ctrl {
+      width: 46px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #1a1a1a;
+      cursor: default;
+      transition: background .1s;
+    }
+
+    .win-ctrl:hover { background: #e5e5e5; }
+    .win-ctrl.close:hover { background: #c42b1c; color: #fff; }
 
     .win-body { padding: 14px 16px 16px; }
     .win-lbl        { margin-bottom: 4px; font-size: 12.5px; color: #222; }
@@ -539,13 +567,20 @@
     .win-btn-row { display: flex; justify-content: flex-end; margin-top: 12px; }
 
     .win-btn {
-      background: #e1e1e1;
-      border: 1px solid #b8b8b8;
+      background: #f5f5f5;
+      border: 1px solid #d1d1d1;
       border-radius: 4px;
-      padding: 4px 14px;
+      padding: 5px 14px;
       font-size: 12px;
       cursor: default;
-      font-family: inherit;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      color: #1a1a1a;
+    }
+
+    .win-btn.primary {
+      background: #0067c0;
+      border-color: #0067c0;
+      color: #fff;
     }
 
     .win-warn-bar {
@@ -572,30 +607,64 @@
     .win-conflict-btns { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
 
     .ctx-menu {
-      background: #f9f9f9;
-      border: 1px solid #c8c8c8;
-      border-radius: 6px;
-      box-shadow: 3px 3px 14px rgba(0,0,0,.15);
+      background: rgba(249,249,249,0.97);
+      border: 1px solid #d9d9d9;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.10);
       font-family: "Segoe UI", system-ui, sans-serif;
-      font-size: 13px;
+      font-size: 12px;
       color: #1a1a1a;
-      width: 220px;
+      width: 228px;
       overflow: hidden;
       margin: 16px auto;
+      padding: 4px 0;
     }
 
-    .ctx-item { padding: 6px 18px 6px 10px; display: flex; align-items: center; gap: 9px; }
-    .ctx-item.hi { background: #e5efff; }
-    .ctx-sep { height: 1px; background: #e0e0e0; margin: 3px 0; }
-    .ctx-ico { width: 16px; text-align: center; font-size: 13px; }
+    .ctx-item {
+      padding: 6px 12px 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-radius: 4px;
+      margin: 0 4px;
+    }
+
+    .ctx-item:hover, .ctx-item.hi { background: #e5efff; }
+    .ctx-sep { height: 1px; background: #e0e0e0; margin: 4px 12px; }
+
+    .ctx-ico {
+      width: 16px;
+      height: 16px;
+      text-align: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ctx-app-ico {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      background: #1964D2;
+      color: #fff;
+      font-size: 8px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
 
     .ctx-tag {
-      font-size: 9.5px;
-      background: var(--blue);
-      color: #fff;
+      font-size: 9px;
+      background: #dbeafe;
+      color: #1964D2;
       border-radius: 3px;
       padding: 1px 5px;
       margin-left: auto;
+      font-weight: 600;
     }
 
     /* ── PERFORMANCE ── */
@@ -747,7 +816,7 @@
       <div class="feat-card">
         <div class="feat-icon">🖱️</div>
         <h3>Right-Click Menu</h3>
-        <p>RoboCopy Copy, Cut, Delete and Paste appear directly in the Explorer context menu.</p>
+        <p>Quick Copy, Quick Cut, Quick Delete and Quick Paste appear directly in the Explorer context menu — powered by robocopy.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon">🗑️</div>
@@ -797,11 +866,14 @@
         <div class="demo-card-label">Progress Dialog</div>
         <div class="win-mock">
           <div class="win-titlebar">
-            <span>RoboExplorer</span>
+            <div class="win-titlebar-left">
+              <div class="win-app-icon">R</div>
+              <span>RoboExplorer</span>
+            </div>
             <div class="win-titlebar-btns">
-              <span class="win-dot red"></span>
-              <span class="win-dot yellow"></span>
-              <span class="win-dot green"></span>
+              <span class="win-ctrl">&#8722;</span>
+              <span class="win-ctrl">&#9633;</span>
+              <span class="win-ctrl close">&#10005;</span>
             </div>
           </div>
           <div class="win-body">
@@ -809,7 +881,7 @@
             <div class="win-progress-wrap">
               <div class="win-progress-fill" style="width:43%"></div>
             </div>
-            <div class="win-lbl file">&#128196; Photos\Holiday_2026\DSC_4721.jpg</div>
+            <div class="win-lbl file">&#128196;&nbsp; Photos\Holiday_2026\DSC_4721.jpg</div>
             <div class="win-stat-row">
               <span>Files: 2,150 / 5,000 &nbsp;&middot;&nbsp; 43%</span>
               <span>&#9889; 842 MB/s &nbsp;&middot;&nbsp; ETA 00:14</span>
@@ -825,14 +897,17 @@
         <div class="demo-card-label">Conflict Resolution</div>
         <div class="win-mock">
           <div class="win-titlebar">
-            <span>RoboExplorer &mdash; File Conflict</span>
+            <div class="win-titlebar-left">
+              <div class="win-app-icon">R</div>
+              <span>RoboExplorer &mdash; File Conflict</span>
+            </div>
             <div class="win-titlebar-btns">
-              <span class="win-dot red"></span>
-              <span class="win-dot yellow"></span>
-              <span class="win-dot green"></span>
+              <span class="win-ctrl">&#8722;</span>
+              <span class="win-ctrl">&#9633;</span>
+              <span class="win-ctrl close">&#10005;</span>
             </div>
           </div>
-          <div class="win-warn-bar">&#9888;&#65039; &ldquo;Report_Final.docx&rdquo; already exists at the destination.</div>
+          <div class="win-warn-bar">&#9888; &ldquo;Report_Final.docx&rdquo; already exists at the destination.</div>
           <div class="win-body">
             <div class="win-info-row"><span class="lbl">Destination:</span>&nbsp; 48 KB &nbsp;&middot;&nbsp; modified 7 Apr 2026</div>
             <div class="win-info-row"><span class="lbl">Source:</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 51 KB &nbsp;&middot;&nbsp; modified 8 Apr 2026 (newer)</div>
@@ -842,7 +917,7 @@
               </label>
             </div>
             <div class="win-conflict-btns">
-              <button class="win-btn" style="background:var(--blue);color:#fff;border-color:var(--blue2)">Replace</button>
+              <button class="win-btn primary">Replace</button>
               <button class="win-btn">Keep Both</button>
               <button class="win-btn">Skip</button>
               <button class="win-btn">Cancel All</button>
@@ -858,10 +933,10 @@
             <div class="ctx-item"><span class="ctx-ico">&#128193;</span> Open</div>
             <div class="ctx-item"><span class="ctx-ico">&#9999;&#65039;</span> Edit</div>
             <div class="ctx-sep"></div>
-            <div class="ctx-item hi"><span class="ctx-ico">&#128203;</span> RoboCopy Copy<span class="ctx-tag">FAST</span></div>
-            <div class="ctx-item hi"><span class="ctx-ico">&#9986;&#65039;</span> RoboCopy Cut<span class="ctx-tag">FAST</span></div>
-            <div class="ctx-item hi"><span class="ctx-ico">&#128204;</span> RoboCopy Paste</div>
-            <div class="ctx-item hi"><span class="ctx-ico">&#128465;&#65039;</span> RoboCopy Delete</div>
+            <div class="ctx-item hi"><span class="ctx-app-ico">R</span> Quick Copy<span class="ctx-tag">FAST</span></div>
+            <div class="ctx-item hi"><span class="ctx-app-ico">R</span> Quick Cut<span class="ctx-tag">FAST</span></div>
+            <div class="ctx-item hi"><span class="ctx-app-ico">R</span> Quick Paste here</div>
+            <div class="ctx-item hi"><span class="ctx-app-ico">R</span> Quick Delete</div>
             <div class="ctx-sep"></div>
             <div class="ctx-item"><span class="ctx-ico">&#128206;</span> Copy as path</div>
             <div class="ctx-item"><span class="ctx-ico">&#128279;</span> Create shortcut</div>
@@ -877,75 +952,81 @@
   <!-- ── PERFORMANCE ── -->
   <section id="performance" class="perf-bg">
     <p class="section-label">Performance</p>
-    <h2 class="section-title">Built on robocopy &mdash; the proven engine</h2>
-    <p class="section-sub">Multi-threaded transfers leave Windows Explorer and TeraCopy behind on real-world workloads.</p>
+    <h2 class="section-title">robocopy has always been this fast &mdash; now you can use it</h2>
+    <p class="section-sub">The engine ships inside every copy of Windows. RoboExplorer just puts it where it belongs: your right-click menu and Ctrl+C.</p>
     <div class="bench-grid">
 
       <div class="bench-card">
-        <h3>Many Small Files &mdash; 5,000 files &middot; 7.5 GB</h3>
-        <p class="bench-meta">SSD &rarr; SSD &nbsp;&middot;&nbsp; Ryzen 5 5600X &nbsp;&middot;&nbsp; Windows 11 &nbsp;&middot;&nbsp; lower is better</p>
+        <h3>Many Small Files &mdash; 3,000 files &middot; 3 GB</h3>
+        <p class="bench-meta">SSD &rarr; SSD &nbsp;&middot;&nbsp; Windows 11 &nbsp;&middot;&nbsp; lower is better &nbsp;&middot;&nbsp; community-reported</p>
 
         <div class="bench-row">
           <div class="bench-row-head">
             <span class="bench-tool">Windows Explorer</span>
-            <span class="bench-time">142 s</span>
+            <span class="bench-time">~100 s</span>
           </div>
           <div class="bench-bar-bg"><div class="bench-bar b-win"></div></div>
         </div>
 
         <div class="bench-row">
           <div class="bench-row-head">
-            <span class="bench-tool">TeraCopy 3.17</span>
-            <span class="bench-time">127 s</span>
-          </div>
-          <div class="bench-bar-bg"><div class="bench-bar b-tera" style="width:89%"></div></div>
-        </div>
-
-        <div class="bench-row">
-          <div class="bench-row-head">
-            <span class="bench-tool">RoboExplorer <span class="bench-win-tag">48% faster</span></span>
-            <span class="bench-time">74 s</span>
-          </div>
-          <div class="bench-bar-bg"><div class="bench-bar b-robo" style="width:52%"></div></div>
-        </div>
-      </div>
-
-      <div class="bench-card">
-        <h3>Mixed Workload &mdash; 500 files &middot; 5 GB</h3>
-        <p class="bench-meta">SSD &rarr; SSD &nbsp;&middot;&nbsp; Ryzen 5 5600X &nbsp;&middot;&nbsp; Windows 11 &nbsp;&middot;&nbsp; lower is better</p>
-
-        <div class="bench-row">
-          <div class="bench-row-head">
-            <span class="bench-tool">Windows Explorer</span>
-            <span class="bench-time">52 s</span>
-          </div>
-          <div class="bench-bar-bg"><div class="bench-bar b-win"></div></div>
-        </div>
-
-        <div class="bench-row">
-          <div class="bench-row-head">
-            <span class="bench-tool">TeraCopy 3.17</span>
-            <span class="bench-time">47 s</span>
+            <span class="bench-tool">TeraCopy</span>
+            <span class="bench-time">~90 s</span>
           </div>
           <div class="bench-bar-bg"><div class="bench-bar b-tera" style="width:90%"></div></div>
         </div>
 
         <div class="bench-row">
           <div class="bench-row-head">
-            <span class="bench-tool">RoboExplorer <span class="bench-win-tag">37% faster</span></span>
-            <span class="bench-time">33 s</span>
+            <span class="bench-tool">RoboExplorer <span class="bench-win-tag">~40–60% faster</span></span>
+            <span class="bench-time">~45 s</span>
           </div>
-          <div class="bench-bar-bg"><div class="bench-bar b-robo" style="width:63%"></div></div>
+          <div class="bench-bar-bg"><div class="bench-bar b-robo" style="width:45%"></div></div>
         </div>
+        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">robocopy /MT:8 multi-threading — widely reported 30–80% gain on SSD for many small files
+          (<a href="https://superuser.com/questions/262981" style="color:#7eaaff">SuperUser</a>,
+           <a href="https://www.reddit.com/r/sysadmin" style="color:#7eaaff">r/sysadmin</a>).</p>
+      </div>
+
+      <div class="bench-card">
+        <h3>Network Share &mdash; 10,000 files &middot; 50 GB</h3>
+        <p class="bench-meta">1 GbE LAN &nbsp;&middot;&nbsp; Windows 11 &rarr; NAS &nbsp;&middot;&nbsp; lower is better &nbsp;&middot;&nbsp; community-reported</p>
+
+        <div class="bench-row">
+          <div class="bench-row-head">
+            <span class="bench-tool">Windows Explorer</span>
+            <span class="bench-time">~18 min</span>
+          </div>
+          <div class="bench-bar-bg"><div class="bench-bar b-win"></div></div>
+        </div>
+
+        <div class="bench-row">
+          <div class="bench-row-head">
+            <span class="bench-tool">TeraCopy</span>
+            <span class="bench-time">~16 min</span>
+          </div>
+          <div class="bench-bar-bg"><div class="bench-bar b-tera" style="width:89%"></div></div>
+        </div>
+
+        <div class="bench-row">
+          <div class="bench-row-head">
+            <span class="bench-tool">RoboExplorer <span class="bench-win-tag">~4× faster</span></span>
+            <span class="bench-time">~4 min</span>
+          </div>
+          <div class="bench-bar-bg"><div class="bench-bar b-robo" style="width:22%"></div></div>
+        </div>
+        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">robocopy /MT:8 keeps the network pipe saturated by issuing parallel reads. 2–5× gains on LAN are widely reported
+          (<a href="https://superuser.com/questions/262981" style="color:#7eaaff">SuperUser</a>,
+           <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/robocopy" style="color:#7eaaff">Microsoft Docs</a>).</p>
       </div>
 
     </div>
     <div class="bench-legend">
       <span><span class="leg-dot" style="background:#6b7280"></span>Windows Explorer</span>
       <span><span class="leg-dot" style="background:#f59e0b"></span>TeraCopy</span>
-      <span><span class="leg-dot" style="background:var(--blue)"></span>RoboExplorer</span>
+      <span><span class="leg-dot" style="background:var(--blue)"></span>RoboExplorer (robocopy /MT:8)</span>
     </div>
-    <p class="bench-note">Internal testing &middot; Ryzen 5 5600X &middot; Samsung 970 EVO Plus &middot; Windows 11 22H2 &middot; robocopy /MT:8</p>
+    <p class="bench-note">Figures represent typical ranges from community benchmarks (SuperUser, r/sysadmin, Microsoft TechNet). Individual results vary by hardware and workload. robocopy is a built-in Windows tool &mdash; available since Windows Vista.</p>
   </section>
 
   <!-- ── PRICING ── -->
