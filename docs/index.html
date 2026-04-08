@@ -875,28 +875,26 @@
   <section class="hero">
     <div class="hero-icon">R</div>
     <h1>RoboExplorer</h1>
-    <p class="tagline">Fast, reliable file copy &amp; move for Windows Explorer — powered by <strong>robocopy</strong>.
-    </p>
+    <p class="tagline">File copy, move and delete for Windows, powered by <strong>robocopy</strong>. Real-time progress, automatic retry, and multi-threaded transfers built into Explorer.</p>
     <div class="badge-row">
-      <span class="badge">Windows 10 / 11</span>
-      <span class="badge">SSD &amp; HDD optimised</span>
-      <span class="badge">Tray app — no window clutter</span>
+      <span class="badge">Windows 10 / 11 (64-bit)</span>
+      <span class="badge">SSD and HDD support</span>
+      <span class="badge">System tray application</span>
       <span class="badge">14-day free trial</span>
     </div>
     <a class="btn-hero"
       href="https://github.com/ghiffaryr/roboexplorer-site/releases/latest/download/RoboExplorer-Setup.exe">
-      Download Installer
-      <span>RoboExplorer-Setup.exe · Free 14-day trial</span>
+      Download Free Trial
+      <span>RoboExplorer-Setup.exe &nbsp;&middot;&nbsp; Version 1.0.0 &nbsp;&middot;&nbsp; 14 days, all features</span>
     </a>
-    <p class="trial-note">No credit card required. 14-day full-feature trial.</p>
+    <p class="trial-note">No credit card required.</p>
   </section>
 
   <!-- ── FEATURES ── -->
   <section id="features" class="features-bg">
     <p class="section-label">Features</p>
-    <h2 class="section-title">Everything Explorer should have</h2>
-    <p class="section-sub">Drop-in replacement for the built-in copy and move — with the reliability of a server-grade
-      tool.</p>
+    <h2 class="section-title">Key Features</h2>
+    <p class="section-sub">RoboExplorer replaces the built-in copy, move, and delete operations in Windows Explorer with robocopy-backed equivalents. No change to your workflow is required.</p>
     <div class="features-grid">
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -905,8 +903,7 @@
             <path d="M6 11h.01M10 11h.01M14 11h.01M18 11h.01M6 15h12" />
           </svg></div>
         <h3>Keyboard Shortcuts</h3>
-        <p>Ctrl+C, Ctrl+X and Ctrl+V are intercepted in Explorer and powered by robocopy. Delete and Shift+Delete bypass
-          Windows Explorer's slow shell-notification overhead entirely.</p>
+        <p>Ctrl+C, Ctrl+X, Ctrl+V, Delete and Shift+Delete are intercepted in Windows Explorer. Copy and move operations run through robocopy. Delete operations bypass Explorer's per-file shell-notification overhead.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -918,16 +915,16 @@
             <line x1="20" y1="20" x2="20" y2="7" />
             <line x1="2" y1="20" x2="22" y2="20" />
           </svg></div>
-        <h3>Real Progress</h3>
-        <p>Speed, ETA, file count and per-file progress — just like a professional file manager.</p>
+        <h3>Transfer Progress</h3>
+        <p>Displays current transfer speed, estimated time remaining, file count, and the name of the file currently being processed.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="13 2 4.5 13 11 13 11 22 19.5 11 13 11 13 2" />
           </svg></div>
-        <h3>Smart Threading</h3>
-        <p>Auto-detects SSD vs HDD and picks the optimal thread count for maximum throughput.</p>
+        <h3>Multi-threaded Transfers</h3>
+        <p>Detects whether the source and destination drives are SSD or HDD and selects the appropriate robocopy thread count accordingly.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -935,8 +932,8 @@
             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
             <path d="M3 3v5h5" />
           </svg></div>
-        <h3>Retry on Failure</h3>
-        <p>Configurable retry count and wait — handles locked files, network drops and busy shares.</p>
+        <h3>Automatic Retry</h3>
+        <p>Configurable retry count and wait interval. Handles locked files, dropped network connections, and busy network shares without user intervention.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -947,7 +944,7 @@
             <line x1="12" y1="11" x2="12.01" y2="11" />
           </svg></div>
         <h3>Conflict Resolution</h3>
-        <p>Replace, Keep Both, Skip, or Cancel All — with an "apply to all" option per operation.</p>
+        <p>When a file or folder already exists at the destination, a dialog prompts to Replace, Keep Both, Skip, or Cancel. An "apply to all" checkbox resolves remaining conflicts in one action.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -956,10 +953,8 @@
             <line x1="12" y1="2" x2="12" y2="9" />
             <line x1="6" y1="9" x2="18" y2="9" />
           </svg></div>
-        <h3>Right-Click Menu</h3>
-        <p>Quick Copy, Quick Cut and Quick Paste use robocopy for maximum speed. Quick Delete skips Windows Explorer's
-          slow per-file shell notifications &mdash; files are enumerated in bulk first, then processed in a tight loop.
-        </p>
+        <h3>Context Menu Integration</h3>
+        <p>Quick Cut, Quick Copy, Quick Paste, and Quick Delete are added directly to the Windows Explorer right-click menu. Copy and move use robocopy. Delete enumerates the file tree in bulk before processing, avoiding Explorer's per-file shell-notification delay.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -969,10 +964,8 @@
             <path d="M10 11v6M14 11v6" />
             <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
           </svg></div>
-        <h3>Fast Delete — Two Modes</h3>
-        <p><strong>Delete</strong> sends to the Recycle Bin (undoable). <strong>Shift+Delete</strong> permanently
-          removes files instantly. Both bypass Explorer's &ldquo;Discovering items&hellip;&rdquo; hang by enumerating
-          files up-front with no per-file shell overhead.</p>
+        <h3>Two-Mode Delete</h3>
+        <p><strong>Delete</strong> moves items to the Recycle Bin. <strong>Shift+Delete</strong> removes items permanently. Both modes skip the "Discovering items" enumeration delay present in Windows Explorer by scanning the file tree up front.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -980,8 +973,8 @@
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
             <path d="M13.73 21a2 2 0 0 1-3.46 0" />
           </svg></div>
-        <h3>System Tray</h3>
-        <p>Runs silently in the background. No floating windows, no dock icons — just works.</p>
+        <h3>System Tray Application</h3>
+        <p>Runs as a background process accessible from the system tray. No taskbar entry. Progress dialogs appear only during active operations.</p>
       </div>
     </div>
   </section>
@@ -989,32 +982,32 @@
   <!-- ── HOW IT WORKS ── -->
   <section id="how">
     <p class="section-label">How it works</p>
-    <h2 class="section-title">Set up in 3 steps</h2>
-    <p class="section-sub">Install once, use forever — completely transparent in everyday use.</p>
+    <h2 class="section-title">Installation and Usage</h2>
+    <p class="section-sub">RoboExplorer installs once and operates transparently inside Windows Explorer. No configuration is required for standard use.</p>
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
-        <h3>Install</h3>
-        <p>Run the installer. It adds the right-click menu and optionally starts with Windows.</p>
+        <h3>Run the installer</h3>
+        <p>The setup wizard registers the right-click context menu entries and optionally configures RoboExplorer to start with Windows.</p>
       </div>
       <div class="step">
         <div class="step-num">2</div>
-        <h3>Use Explorer normally</h3>
-        <p>Copy, move and delete files exactly as you always have. RoboExplorer handles them silently.</p>
+        <h3>Use Windows Explorer as normal</h3>
+        <p>Keyboard shortcuts and right-click menu entries work exactly as before. RoboExplorer intercepts the operations and routes them through robocopy.</p>
       </div>
       <div class="step">
         <div class="step-num">3</div>
-        <h3>Watch the progress</h3>
-        <p>A clean progress dialog shows speed, ETA and conflicts — only when you need it.</p>
+        <h3>Monitor transfers</h3>
+        <p>A progress dialog displays speed, ETA, file count, and conflict prompts during active operations. It closes automatically on completion.</p>
       </div>
     </div>
   </section>
 
   <!-- ── DEMO ── -->
   <section id="demo" class="demo-bg">
-    <p class="section-label">See It In Action</p>
-    <h2 class="section-title">Clean UI at every step</h2>
-    <p class="section-sub">Progress, conflicts, and the right-click menu — all purpose-built for Explorer.</p>
+    <p class="section-label">Interface</p>
+    <h2 class="section-title">Screenshots</h2>
+    <p class="section-sub">RoboExplorer uses standard Windows dialog controls. All windows follow Windows 11 visual conventions.</p>
     <div class="demo-grid">
 
       <div class="demo-card">
@@ -1109,9 +1102,8 @@
   <!-- ── PERFORMANCE ── -->
   <section id="performance" class="perf-bg">
     <p class="section-label">Performance</p>
-    <h2 class="section-title">robocopy has always been this fast &mdash; now you can use it</h2>
-    <p class="section-sub">The engine ships inside every copy of Windows. RoboExplorer just puts it where it belongs:
-      your right-click menu and Ctrl+C.</p>
+    <h2 class="section-title">Transfer Speed Comparison</h2>
+    <p class="section-sub">robocopy is a Microsoft-built tool included in every edition of Windows since Vista. Its multi-threaded mode (/MT) is not accessible from Windows Explorer. RoboExplorer exposes it through standard keyboard shortcuts and the right-click menu.</p>
     <div class="bench-grid">
 
       <div class="bench-card">
@@ -1211,30 +1203,28 @@
   <!-- ── PRICING ── -->
   <section id="pricing" class="pricing-bg">
     <p class="section-label">Pricing</p>
-    <h2 class="section-title">Simple, one-time pricing</h2>
-    <p class="section-sub">No subscriptions, no renewals. Pay once, own it forever.</p>
+    <h2 class="section-title">Licensing</h2>
+    <p class="section-sub">RoboExplorer is sold as a one-time per-computer license. There are no subscriptions or recurring fees.</p>
 
     <div class="pricing-card">
       <h2>Lifetime License</h2>
       <div class="price">$9.99</div>
-      <p class="price-note">One-time payment &mdash; per computer</p>
+      <p class="price-note">One-time payment &nbsp;&middot;&nbsp; per computer</p>
       <ul class="price-list">
-        <li>All features, forever</li>
-        <li>Free updates for life</li>
-        <li>Per-computer activation</li>
-        <li>14-day free trial first</li>
+        <li>Full feature access, no expiry</li>
+        <li>Free version updates</li>
+        <li>Single-computer activation</li>
+        <li>14-day free trial available</li>
         <li>Email support</li>
       </ul>
       <a class="btn-buy" href="https://paypal.me/ghiffaryr">
-        Buy Now via PayPal &rarr;
+        Purchase via PayPal &rarr;
       </a>
-      <p class="fine">After payment, email <a href="mailto:grifqialdi@gmail.com"
-          style="color:#aedcff">grifqialdi@gmail.com</a> with your name, email, and Machine ID (shown in the app's About
-        dialog). You'll receive your license key within 24 hours.</p>
+      <p class="fine">After payment, send your name, email address, and Machine ID (available in the About dialog) to <a href="mailto:grifqialdi@gmail.com" style="color:#aedcff">grifqialdi@gmail.com</a>. A license key will be issued within 24 hours.</p>
     </div>
 
     <div class="trial-card">
-      <p><strong>Not ready to buy?</strong> Start the free 14-day trial — no credit card, all features included.</p>
+      <p>A 14-day free trial is available. No registration or credit card is required. All features are enabled during the trial period.</p>
       <br />
       <a href="https://github.com/ghiffaryr/roboexplorer-site/releases/latest/download/RoboExplorer-Setup.exe"
         style="color: var(--blue); font-weight: 700;">
@@ -1246,15 +1236,14 @@
   <!-- ── REQUIREMENTS ── -->
   <section id="requirements">
     <p class="section-label">Requirements</p>
-    <h2 class="section-title">System requirements</h2>
-    <p class="section-sub">RoboExplorer is a lightweight tray app with minimal dependencies.</p>
+    <h2 class="section-title">System Requirements</h2>
+    <p class="section-sub">RoboExplorer is a lightweight background application. Disk and memory usage are minimal.</p>
     <ul class="req-list">
       <li>Windows 10 or Windows 11 (64-bit)</li>
-      <li><a href="https://dotnet.microsoft.com/download/dotnet/9.0/runtime?initial-os=windows">.NET 9 Desktop
-          Runtime</a> (free — the installer will prompt if missing)</li>
-      <li>robocopy — included in every edition of Windows since Vista</li>
-      <li>~10 MB disk space</li>
-      <li>Administrator access for installation (to write to Program Files)</li>
+      <li><a href="https://dotnet.microsoft.com/download/dotnet/9.0/runtime?initial-os=windows">.NET 9 Desktop Runtime</a> (the installer will prompt if not present)</li>
+      <li>robocopy (included in all editions of Windows since Windows Vista)</li>
+      <li>Approximately 10 MB disk space</li>
+      <li>Administrator privileges required during installation</li>
     </ul>
   </section>
 
@@ -1266,8 +1255,8 @@
       <a href="https://github.com/ghiffaryr/roboexplorer-site/issues">Support</a>
       <a href="https://github.com/ghiffaryr">ghiffaryr</a>
     </div>
-    <p>© 2026 Ghiffary Rifqialdi. All rights reserved.<br />
-      RoboExplorer is commercial software. Unauthorised distribution is prohibited.</p>
+    <p>Copyright &copy; 2026 Ghiffary Rifqialdi. All rights reserved.<br />
+      RoboExplorer is proprietary software. Redistribution without a valid license is prohibited.</p>
   </footer>
 
 </body>
