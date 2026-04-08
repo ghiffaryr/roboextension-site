@@ -583,14 +583,6 @@
       background: #0078d4;
     }
 
-    .win-stat-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      color: #666;
-      margin-top: 4px;
-    }
-
     .win-btn-row {
       display: flex;
       justify-content: flex-end;
@@ -620,36 +612,30 @@
 
     .win-conflict-btns {
       display: flex;
-      gap: 6px;
+      gap: 8px;
       margin-top: 14px;
-      align-items: center;
     }
 
-    .win-conflict-btns .spacer {
+    .win-conflict-btns .win-btn {
       flex: 1;
     }
 
-    .win-info-grid {
-      display: grid;
-      grid-template-columns: 80px 1fr;
-      gap: 5px 0;
+    .win-info-block {
       font-size: 12px;
-      margin: 10px 0;
-    }
-
-    .win-info-grid .k {
-      font-weight: 700;
       color: #333;
-      padding-top: 1px;
+      margin: 4px 0;
+      line-height: 1.6;
     }
 
-    .win-info-grid .v {
-      color: #666;
+    .win-info-block .indent {
+      color: #555;
+      padding-left: 12px;
     }
 
-    .win-sep {
-      height: 1px;
-      background: #e0e0e0;
+    .win-sep-3d {
+      height: 2px;
+      border-top: 1px solid #aaa;
+      border-bottom: 1px solid #fff;
       margin: 10px 0;
     }
 
@@ -1064,7 +1050,7 @@
           <div class="win-titlebar">
             <div class="win-titlebar-left">
               <div class="win-app-icon">R</div>
-              <span>RoboExplorer</span>
+              <span>43% - RoboExplorer</span>
             </div>
             <div class="win-titlebar-btns">
               <span class="win-ctrl">&#8722;</span>
@@ -1073,15 +1059,13 @@
             </div>
           </div>
           <div class="win-body">
-            <div class="win-lbl bold">Copying 5,000 files to Documents&hellip;</div>
+            <div class="win-lbl bold">Copying 2 item(s) to &ldquo;G2Academy&rdquo;</div>
             <div class="win-progress-wrap">
               <div class="win-progress-fill" style="width:43%"></div>
             </div>
-            <div class="win-lbl file">&#128196;&nbsp; Photos\Holiday_2026\DSC_4721.jpg</div>
-            <div class="win-stat-row">
-              <span>Files: 2,150 / 5,000 &nbsp;&middot;&nbsp; 43%</span>
-              <span>&#9889; 842 MB/s &nbsp;&middot;&nbsp; ETA 00:14</span>
-            </div>
+            <div class="win-lbl file">Photos\Holiday_2026\DSC_4721.jpg</div>
+            <div class="win-lbl" style="margin-top:2px">2,150 of 5,000 items&emsp;(8.4 GB of 19.6 GB)</div>
+            <div class="win-lbl file" style="margin-top:2px">842.0 MB/s&emsp;-&emsp;About 14 seconds remaining</div>
             <div class="win-btn-row">
               <button class="win-btn">Cancel</button>
             </div>
@@ -1102,20 +1086,23 @@
             </div>
           </div>
           <div class="win-body">
-            <div class="win-lbl">&ldquo;Report_Final.docx&rdquo; already exists at the destination.</div>
-            <div class="win-info-grid">
-              <span class="k">Destination:</span><span class="v">48 KB &nbsp;&middot;&nbsp; modified 7 Apr 2026</span>
-              <span class="k">Source:</span><span class="v">51 KB &nbsp;&middot;&nbsp; modified 8 Apr 2026 <strong>(newer)</strong></span>
+            <div class="win-lbl bold">A file named &ldquo;Report_Final.docx&rdquo; already exists at the destination.</div>
+            <div class="win-info-block">
+              Destination file:<br>
+              <span class="indent">Size: 48 KB&ensp;|&ensp;Modified: 4/7/2026 3:12 PM</span>
             </div>
-            <div class="win-sep"></div>
+            <div class="win-info-block">
+              Source file:<br>
+              <span class="indent">Size: 51 KB&ensp;|&ensp;Modified: 4/8/2026 10:41 PM</span>
+            </div>
+            <div class="win-sep-3d"></div>
             <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#333;cursor:default">
-              <input type="checkbox" disabled> Apply to all remaining conflicts
+              <input type="checkbox" disabled> Do this for all remaining conflicts
             </label>
             <div class="win-conflict-btns">
               <button class="win-btn primary">Replace</button>
               <button class="win-btn">Keep Both</button>
               <button class="win-btn">Skip</button>
-              <div class="spacer"></div>
               <button class="win-btn">Cancel All</button>
             </div>
           </div>
