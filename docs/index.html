@@ -657,36 +657,79 @@
     }
 
     .ctx-menu {
-      background: rgba(249, 249, 249, 0.98);
-      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: rgba(43, 43, 43, 0.96);
+      backdrop-filter: blur(30px) saturate(180%);
+      -webkit-backdrop-filter: blur(30px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 8px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.14), 0 1px 3px rgba(0, 0, 0, 0.08);
-      font-family: "Segoe UI", system-ui, sans-serif;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.35);
+      font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
       font-size: 12px;
-      color: #1a1a1a;
-      width: 228px;
+      color: #ffffff;
+      width: 240px;
       overflow: hidden;
       padding: 4px 0;
     }
 
+    /* top icon-button toolbar */
+    .ctx-toolbar {
+      display: flex;
+      align-items: stretch;
+      padding: 2px 4px 0;
+      gap: 0;
+    }
+
+    .ctx-toolbar-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      height: 52px;
+      border-radius: 4px;
+      cursor: default;
+      font-size: 10px;
+      color: rgba(255,255,255,0.88);
+      padding: 0 2px;
+    }
+
+    .ctx-toolbar-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .ctx-toolbar-ico {
+      font-family: 'Segoe Fluent Icons', 'Segoe MDL2 Assets', sans-serif;
+      font-size: 15px;
+      color: rgba(255,255,255,0.88);
+      line-height: 1;
+    }
+
+    .ctx-toolbar-sep {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.10);
+      margin: 3px 12px 0;
+    }
+
     .ctx-item {
       padding: 0 10px;
-      height: 32px;
+      height: 36px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       border-radius: 4px;
-      margin: 0 4px;
+      margin: 1px 4px;
+      color: rgba(255,255,255,0.92);
     }
 
     .ctx-item.hi {
-      background: rgba(0, 0, 0, 0.05);
+      background: rgba(255, 255, 255, 0.08);
     }
 
     .ctx-sep {
       height: 1px;
-      background: rgba(0, 0, 0, 0.09);
-      margin: 4px 12px;
+      background: rgba(255, 255, 255, 0.10);
+      margin: 3px 12px;
     }
 
     .ctx-ico {
@@ -698,7 +741,7 @@
       justify-content: center;
       font-family: 'Segoe Fluent Icons', 'Segoe MDL2 Assets', sans-serif;
       font-size: 14px;
-      color: #1a1a1a;
+      color: rgba(255,255,255,0.85);
     }
 
     .ctx-app-ico {
@@ -1080,16 +1123,20 @@
         <div class="demo-card-label">Explorer Right-Click Menu</div>
         <div class="ctx-wrap">
           <div class="ctx-menu">
+            <div class="ctx-toolbar">
+              <div class="ctx-toolbar-btn"><span class="ctx-toolbar-ico">&#xE8C6;</span>Cut</div>
+              <div class="ctx-toolbar-btn"><span class="ctx-toolbar-ico">&#xE8C8;</span>Copy</div>
+              <div class="ctx-toolbar-btn"><span class="ctx-toolbar-ico">&#xE8AC;</span>Rename</div>
+              <div class="ctx-toolbar-btn"><span class="ctx-toolbar-ico">&#xE74D;</span>Delete</div>
+            </div>
+            <div class="ctx-toolbar-sep"></div>
             <div class="ctx-item"><span class="ctx-ico">&#xE8DA;</span> Open</div>
-            <div class="ctx-item"><span class="ctx-ico">&#xE70F;</span> Rename</div>
+            <div class="ctx-item"><span class="ctx-ico">&#xE8B5;</span> Share</div>
             <div class="ctx-sep"></div>
             <div class="ctx-item hi"><span class="ctx-app-ico">R</span> Quick Cut</div>
             <div class="ctx-item"><span class="ctx-app-ico">R</span> Quick Copy</div>
             <div class="ctx-item"><span class="ctx-app-ico">R</span> Quick Paste</div>
             <div class="ctx-item"><span class="ctx-app-ico">R</span> Quick Delete</div>
-            <div class="ctx-sep"></div>
-            <div class="ctx-item"><span class="ctx-ico">&#xE8C8;</span> Copy as path</div>
-            <div class="ctx-item"><span class="ctx-ico">&#xE8A4;</span> Create shortcut</div>
             <div class="ctx-sep"></div>
             <div class="ctx-item"><span class="ctx-ico">&#xE946;</span> Properties</div>
           </div>
