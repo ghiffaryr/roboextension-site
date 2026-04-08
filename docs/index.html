@@ -791,7 +791,7 @@
       <div class="feat-card">
         <div class="feat-icon">⌨️</div>
         <h3>Keyboard Shortcuts</h3>
-        <p>Ctrl+C, Ctrl+X and Ctrl+V are intercepted in Explorer and powered by robocopy. Delete sends files to the Recycle Bin via the Windows shell API.</p>
+        <p>Ctrl+C, Ctrl+X and Ctrl+V are intercepted in Explorer and powered by robocopy. Delete and Shift+Delete bypass Windows Explorer's slow shell-notification overhead entirely.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon">📊</div>
@@ -816,12 +816,12 @@
       <div class="feat-card">
         <div class="feat-icon">🖱️</div>
         <h3>Right-Click Menu</h3>
-        <p>Quick Copy, Quick Cut and Quick Paste use robocopy for maximum speed. Quick Delete goes straight to the Recycle Bin via the Windows shell — safely and instantly.</p>
+        <p>Quick Copy, Quick Cut and Quick Paste use robocopy for maximum speed. Quick Delete skips Windows Explorer's slow per-file shell notifications &mdash; files are enumerated in bulk first, then processed in a tight loop.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon">🗑️</div>
-        <h3>Recycle Bin Delete</h3>
-        <p>Delete sends files to the Recycle Bin so you can undo mistakes, just as expected.</p>
+        <h3>Fast Delete — Two Modes</h3>
+        <p><strong>Delete</strong> sends to the Recycle Bin (undoable). <strong>Shift+Delete</strong> permanently removes files instantly. Both bypass Explorer's &ldquo;Discovering items&hellip;&rdquo; hang by enumerating files up-front with no per-file shell overhead.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon">🔔</div>
