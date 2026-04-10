@@ -441,8 +441,176 @@
     }
 
     @media (max-width: 600px) {
+      /* nav-links already hidden at ≤900px */
+    }
+
+    /* ── RESPONSIVE ── */
+
+    /* Tablet — ≤900px */
+    @media (max-width: 900px) {
       .nav-links {
         display: none;
+      }
+
+      .hero {
+        padding: 60px 6vw 70px;
+      }
+
+      section {
+        padding: 56px 6vw;
+      }
+
+      .bench-grid {
+        grid-template-columns: 1fr;
+        max-width: 560px;
+      }
+
+      .demo-grid {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      }
+    }
+
+    /* Mobile — ≤640px */
+    @media (max-width: 640px) {
+      nav {
+        padding: 0 4vw;
+        height: 52px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .nav-cta {
+        font-size: 0.78rem;
+        padding: 6px 12px;
+      }
+
+      .hero {
+        padding: 48px 5vw 56px;
+      }
+
+      .hero-icon {
+        width: 72px;
+        height: 72px;
+        font-size: 2.2rem;
+        border-radius: 16px;
+        margin-bottom: 20px;
+      }
+
+      .hero .tagline {
+        font-size: 1rem;
+      }
+
+      .hero .badge-row {
+        gap: 7px;
+        margin: 18px 0 28px;
+      }
+
+      .badge {
+        font-size: 0.76rem;
+        padding: 3px 10px;
+      }
+
+      .btn-hero {
+        font-size: 0.95rem;
+        padding: 12px 22px;
+        width: 100%;
+        max-width: 360px;
+      }
+
+      .btn-hero span {
+        font-size: 0.72rem;
+      }
+
+      section {
+        padding: 44px 5vw;
+      }
+
+      .section-sub {
+        margin-bottom: 32px;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .feat-card {
+        padding: 20px 18px;
+      }
+
+      .steps {
+        flex-direction: column;
+        gap: 24px;
+        align-items: center;
+      }
+
+      .step {
+        min-width: unset;
+        width: 100%;
+        max-width: 380px;
+      }
+
+      .demo-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .win-conflict-btns {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .win-mock {
+        margin: 12px;
+        font-size: 11px;
+      }
+
+
+
+      .bench-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .bench-card {
+        padding: 20px 18px;
+      }
+
+      .pricing-card {
+        padding: 32px 22px;
+      }
+
+      .price {
+        font-size: 2.8rem;
+      }
+
+      .trial-card {
+        padding: 16px 18px;
+      }
+
+      .req-list {
+        padding: 0 4px;
+      }
+
+      .ctx-wrap {
+        padding: 14px;
+      }
+
+      .ctx-menu {
+        width: 210px;
+      }
+    }
+
+    /* Narrow — ≤380px */
+    @media (max-width: 380px) {
+      .nav-brand span {
+        display: none;
+      }
+
+
+
+      .btn-hero {
+        font-size: 0.88rem;
       }
     }
 
@@ -453,7 +621,7 @@
 
     .demo-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 28px;
       max-width: 1100px;
       margin: 0 auto;
@@ -611,13 +779,18 @@
     }
 
     .win-conflict-btns {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 8px;
       margin-top: 14px;
     }
 
     .win-conflict-btns .win-btn {
-      flex: 1;
+      min-width: 0;
+      justify-content: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .win-info-block {
@@ -854,7 +1027,7 @@
   <nav>
     <a class="nav-brand" href="#">
       <div class="nav-icon">R</div>
-      RoboExplorer
+      <span>RoboExplorer</span>
     </a>
     <ul class="nav-links">
       <li><a href="#features">Features</a></li>
@@ -874,7 +1047,8 @@
   <section class="hero">
     <div class="hero-icon">R</div>
     <h1>RoboExplorer</h1>
-    <p class="tagline">File copy, move and delete for Windows, powered by <strong>robocopy</strong>. Real-time progress, automatic retry, and multi-threaded transfers built into Explorer.</p>
+    <p class="tagline">File copy, move and delete for Windows, powered by <strong>robocopy</strong>. Real-time progress,
+      automatic retry, and multi-threaded transfers built into Explorer.</p>
     <div class="badge-row">
       <span class="badge">Windows 10 / 11 (64-bit)</span>
       <span class="badge">SSD and HDD support</span>
@@ -893,7 +1067,8 @@
   <section id="features" class="features-bg">
     <p class="section-label">Features</p>
     <h2 class="section-title">Key Features</h2>
-    <p class="section-sub">RoboExplorer replaces the built-in copy, move, and delete operations in Windows Explorer with robocopy-backed equivalents. No change to your workflow is required.</p>
+    <p class="section-sub">RoboExplorer replaces the built-in copy, move, and delete operations in Windows Explorer with
+      robocopy-backed equivalents. No change to your workflow is required.</p>
     <div class="features-grid">
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -902,7 +1077,8 @@
             <path d="M6 11h.01M10 11h.01M14 11h.01M18 11h.01M6 15h12" />
           </svg></div>
         <h3>Keyboard Shortcuts</h3>
-        <p>Ctrl+C, Ctrl+X, Ctrl+V, Delete and Shift+Delete are intercepted in Windows Explorer. Copy and move operations run through robocopy. Delete operations bypass Explorer's per-file shell-notification overhead.</p>
+        <p>Ctrl+C, Ctrl+X, Ctrl+V, Delete and Shift+Delete are intercepted in Windows Explorer. Copy and move operations
+          run through robocopy. Delete operations bypass Explorer's per-file shell-notification overhead.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -915,7 +1091,8 @@
             <line x1="2" y1="20" x2="22" y2="20" />
           </svg></div>
         <h3>Transfer Progress</h3>
-        <p>Displays current transfer speed, estimated time remaining, file count, and the name of the file currently being processed.</p>
+        <p>Displays current transfer speed, estimated time remaining, file count, and the name of the file currently
+          being processed.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -923,7 +1100,8 @@
             <polygon points="13 2 4.5 13 11 13 11 22 19.5 11 13 11 13 2" />
           </svg></div>
         <h3>Multi-threaded Transfers</h3>
-        <p>Detects whether the source and destination drives are SSD or HDD and selects the appropriate robocopy thread count accordingly.</p>
+        <p>Detects whether the source and destination drives are SSD or HDD and selects the appropriate robocopy thread
+          count accordingly.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -932,7 +1110,8 @@
             <path d="M3 3v5h5" />
           </svg></div>
         <h3>Automatic Retry</h3>
-        <p>Configurable retry count and wait interval. Handles locked files, dropped network connections, and busy network shares without user intervention.</p>
+        <p>Configurable retry count and wait interval. Handles locked files, dropped network connections, and busy
+          network shares without user intervention.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -943,7 +1122,8 @@
             <line x1="12" y1="11" x2="12.01" y2="11" />
           </svg></div>
         <h3>Conflict Resolution</h3>
-        <p>When a file or folder already exists at the destination, a dialog prompts to Replace, Keep Both, Skip, or Cancel. An "apply to all" checkbox resolves remaining conflicts in one action.</p>
+        <p>When a file or folder already exists at the destination, a dialog prompts to Replace, Keep Both, Skip, or
+          Cancel. An "apply to all" checkbox resolves remaining conflicts in one action.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -953,7 +1133,9 @@
             <line x1="6" y1="9" x2="18" y2="9" />
           </svg></div>
         <h3>Context Menu Integration</h3>
-        <p>Quick Cut, Quick Copy, Quick Paste, and Quick Delete are added directly to the Windows Explorer right-click menu. Copy and move use robocopy. Delete enumerates the file tree in bulk before processing, avoiding Explorer's per-file shell-notification delay.</p>
+        <p>Quick Cut, Quick Copy, Quick Paste, and Quick Delete are added directly to the Windows Explorer right-click
+          menu. Copy and move use robocopy. Delete enumerates the file tree in bulk before processing, avoiding
+          Explorer's per-file shell-notification delay.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -964,7 +1146,9 @@
             <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
           </svg></div>
         <h3>Two-Mode Delete</h3>
-        <p><strong>Delete</strong> moves items to the Recycle Bin. <strong>Shift+Delete</strong> removes items permanently. Both modes skip the "Discovering items" enumeration delay present in Windows Explorer by scanning the file tree up front.</p>
+        <p><strong>Delete</strong> moves items to the Recycle Bin. <strong>Shift+Delete</strong> removes items
+          permanently. Both modes skip the "Discovering items" enumeration delay present in Windows Explorer by scanning
+          the file tree up front.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -973,7 +1157,8 @@
             <path d="M13.73 21a2 2 0 0 1-3.46 0" />
           </svg></div>
         <h3>System Tray Application</h3>
-        <p>Runs as a background process accessible from the system tray. No taskbar entry. Progress dialogs appear only during active operations.</p>
+        <p>Runs as a background process accessible from the system tray. No taskbar entry. Progress dialogs appear only
+          during active operations.</p>
       </div>
     </div>
   </section>
@@ -982,22 +1167,26 @@
   <section id="how">
     <p class="section-label">How it works</p>
     <h2 class="section-title">Installation and Usage</h2>
-    <p class="section-sub">RoboExplorer installs once and operates transparently inside Windows Explorer. No configuration is required for standard use.</p>
+    <p class="section-sub">RoboExplorer installs once and operates transparently inside Windows Explorer. No
+      configuration is required for standard use.</p>
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
         <h3>Run the installer</h3>
-        <p>The setup wizard registers the right-click context menu entries and optionally configures RoboExplorer to start with Windows.</p>
+        <p>The setup wizard registers the right-click context menu entries and optionally configures RoboExplorer to
+          start with Windows.</p>
       </div>
       <div class="step">
         <div class="step-num">2</div>
         <h3>Use Windows Explorer as normal</h3>
-        <p>Keyboard shortcuts and right-click menu entries work exactly as before. RoboExplorer intercepts the operations and routes them through robocopy.</p>
+        <p>Keyboard shortcuts and right-click menu entries work exactly as before. RoboExplorer intercepts the
+          operations and routes them through robocopy.</p>
       </div>
       <div class="step">
         <div class="step-num">3</div>
         <h3>Monitor transfers</h3>
-        <p>A progress dialog displays speed, ETA, file count, and conflict prompts during active operations. It closes automatically on completion.</p>
+        <p>A progress dialog displays speed, ETA, file count, and conflict prompts during active operations. It closes
+          automatically on completion.</p>
       </div>
     </div>
   </section>
@@ -1006,7 +1195,8 @@
   <section id="demo" class="demo-bg">
     <p class="section-label">Interface</p>
     <h2 class="section-title">Screenshots</h2>
-    <p class="section-sub">RoboExplorer uses standard Windows dialog controls. All windows follow Windows 11 visual conventions.</p>
+    <p class="section-sub">RoboExplorer uses standard Windows dialog controls. All windows follow Windows 11 visual
+      conventions.</p>
     <div class="demo-grid">
 
       <div class="demo-card">
@@ -1015,7 +1205,7 @@
           <div class="win-titlebar">
             <div class="win-titlebar-left">
               <div class="win-app-icon">R</div>
-              <span>RoboExplorer &#8212; 43%</span>
+              <span>RoboExplorer &#8212; 48%</span>
             </div>
             <div class="win-titlebar-btns">
               <span class="win-ctrl">&#8722;</span>
@@ -1023,13 +1213,13 @@
             </div>
           </div>
           <div class="win-body">
-            <div class="win-lbl bold">Copying 2 item(s) to &ldquo;G2Academy&rdquo;</div>
-            <div class="win-progress-wrap">
-              <div class="win-progress-fill" style="width:43%"></div>
+            <div class="win-lbl">Copying files...</div>
+            <div class="win-progress-wrap" style="height:20px;margin:12px 0 8px">
+              <div class="win-progress-fill" style="width:48%;background:#107c10"></div>
             </div>
             <div class="win-lbl file">Photos\Holiday_2026\DSC_4721.jpg</div>
-            <div class="win-lbl" style="margin-top:2px">2,150 of 5,000 items&emsp;(8.4 GB of 19.6 GB)</div>
-            <div class="win-lbl file" style="margin-top:2px">842.0 MB/s&emsp;-&emsp;About 14 seconds remaining</div>
+            <div class="win-lbl" style="margin-top:4px">50 of 100 items&emsp;(500.0 MB of 1.00 GB)</div>
+            <div class="win-lbl file" style="margin-top:2px">320.1 MB/s&emsp;&ndash;&emsp;A few seconds remaining</div>
             <div class="win-btn-row">
               <button class="win-btn">Cancel</button>
             </div>
@@ -1050,7 +1240,8 @@
             </div>
           </div>
           <div class="win-body">
-            <div class="win-lbl bold">A file named &ldquo;Report_Final.docx&rdquo; already exists at the destination.</div>
+            <div class="win-lbl" style="margin-bottom:10px">A file named &ldquo;Report_Final.docx&rdquo; already exists
+              at the destination.</div>
             <div class="win-info-block">
               Destination file:<br>
               <span class="indent">Size: 48 KB&ensp;|&ensp;Modified: 4/7/2026 3:12 PM</span>
@@ -1105,7 +1296,9 @@
   <section id="performance" class="perf-bg">
     <p class="section-label">Performance</p>
     <h2 class="section-title">Transfer Speed Comparison</h2>
-    <p class="section-sub">robocopy is a Microsoft-built tool included in every edition of Windows since Vista. Its multi-threaded mode (/MT) is not accessible from Windows Explorer. RoboExplorer exposes it through standard keyboard shortcuts and the right-click menu.</p>
+    <p class="section-sub">robocopy is a Microsoft-built tool included in every edition of Windows since Vista. Its
+      multi-threaded mode (/MT) is not accessible from Windows Explorer. RoboExplorer exposes it through standard
+      keyboard shortcuts and the right-click menu.</p>
     <div class="bench-grid">
 
       <div class="bench-card">
@@ -1206,7 +1399,8 @@
   <section id="pricing" class="pricing-bg">
     <p class="section-label">Pricing</p>
     <h2 class="section-title">Licensing</h2>
-    <p class="section-sub">RoboExplorer is sold as a one-time per-computer license. There are no subscriptions or recurring fees.</p>
+    <p class="section-sub">RoboExplorer is sold as a one-time per-computer license. There are no subscriptions or
+      recurring fees.</p>
 
     <div class="pricing-card">
       <h2>Lifetime License</h2>
@@ -1222,11 +1416,14 @@
       <a class="btn-buy" href="https://paypal.me/ghiffaryr">
         Purchase via PayPal &rarr;
       </a>
-      <p class="fine">After payment, send your name, email address, and Machine ID (available in the About dialog) to <a href="mailto:grifqialdi@gmail.com" style="color:#aedcff">grifqialdi@gmail.com</a>. A license key will be issued within 24 hours.</p>
+      <p class="fine">After payment, send your name, email address, and Machine ID (available in the About dialog) to <a
+          href="mailto:grifqialdi@gmail.com" style="color:#aedcff">grifqialdi@gmail.com</a>. A license key will be
+        issued within 24 hours.</p>
     </div>
 
     <div class="trial-card">
-      <p>A 14-day free trial is available. No registration or credit card is required. All features are enabled during the trial period.</p>
+      <p>A 14-day free trial is available. No registration or credit card is required. All features are enabled during
+        the trial period.</p>
       <br />
       <a href="https://github.com/ghiffaryr/roboexplorer-site/releases/latest/download/RoboExplorer-Setup.exe"
         style="color: var(--blue); font-weight: 700;">
@@ -1242,7 +1439,8 @@
     <p class="section-sub">RoboExplorer is a lightweight background application. Disk and memory usage are minimal.</p>
     <ul class="req-list">
       <li>Windows 10 or Windows 11 (64-bit)</li>
-      <li><a href="https://dotnet.microsoft.com/download/dotnet/9.0/runtime?initial-os=windows">.NET 9 Desktop Runtime</a> (the installer will prompt if not present)</li>
+      <li><a href="https://dotnet.microsoft.com/download/dotnet/9.0/runtime?initial-os=windows">.NET 9 Desktop
+          Runtime</a> (the installer will prompt if not present)</li>
       <li>robocopy (included in all editions of Windows since Windows Vista)</li>
       <li>Approximately 10 MB disk space</li>
       <li>Administrator privileges required during installation</li>
