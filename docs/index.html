@@ -1079,8 +1079,7 @@
           </svg></div>
         <h3>Keyboard Shortcuts</h3>
         <p>Ctrl+C, Ctrl+X, Ctrl+V, Delete and Shift+Delete are intercepted in Windows Explorer. Copy and move operations
-          run through robocopy. Permanent delete uses robocopy /MIR for instant removal, correctly handling symlinks and
-          junctions.</p>
+          run through robocopy. Delete operations bypass Explorer's per-file shell-notification overhead.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -1136,7 +1135,8 @@
           </svg></div>
         <h3>Context Menu Integration</h3>
         <p>Quick Cut, Quick Copy, Quick Paste, and Quick Delete are added directly to the Windows Explorer right-click
-          menu. All operations use robocopy under the hood.</p>
+          menu. Copy and move use robocopy. Delete enumerates the file tree in bulk before processing, avoiding
+          Explorer's per-file shell-notification delay.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -1148,8 +1148,8 @@
           </svg></div>
         <h3>Two-Mode Delete</h3>
         <p><strong>Delete</strong> moves items to the Recycle Bin. <strong>Shift+Delete</strong> removes items
-          permanently using robocopy /MIR — no pre-enumeration delay, and symlinks and junctions are handled
-          correctly without traversal errors.</p>
+          permanently. Both modes skip the "Discovering items" enumeration delay present in Windows Explorer by scanning
+          the file tree up front.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
