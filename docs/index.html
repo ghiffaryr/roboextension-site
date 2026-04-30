@@ -1166,7 +1166,8 @@
         <h3>Context Menu Integration</h3>
         <p>Quick Cut, Quick Copy, Quick Paste, and Quick Delete are added directly to the Windows Explorer right-click
           menu. Copy and move use an adaptive engine that automatically selects the optimal transfer path. Delete
-          processes the file tree efficiently in bulk, which is significantly faster than Explorer on large file counts.</p>
+          processes the file tree efficiently in bulk, which is significantly faster than Explorer on large file counts.
+        </p>
       </div>
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
@@ -1648,7 +1649,8 @@
             <div class="bench-bar b-robo" style="width:51%"></div>
           </div>
         </div>
-        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Disk-aware scheduling keeps throughput high on spinning disks.</p>
+        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Disk-aware scheduling keeps throughput high on
+          spinning disks.</p>
       </div>
 
       <div class="bench-card">
@@ -1763,160 +1765,262 @@
 
       <div class="bench-card">
         <h3>Move &mdash; Small Files &mdash; 8,000 files &middot; 530 MB</h3>
-        <p class="bench-meta">SSD &rarr; SSD &nbsp;&middot;&nbsp; same-volume &nbsp;&middot;&nbsp; lower is better &nbsp;&middot;&nbsp; median of 3 runs</p>
+        <p class="bench-meta">SSD &rarr; SSD &nbsp;&middot;&nbsp; same-volume &nbsp;&middot;&nbsp; lower is better
+          &nbsp;&middot;&nbsp; median of 3 runs</p>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Windows Explorer</span><span class="bench-time">44.7 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-win" style="width:100%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Windows Explorer</span><span class="bench-time">44.7
+              s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-win" style="width:100%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">FastCopy</span><span class="bench-time">21.4 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-fast" style="width:48%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">FastCopy</span><span class="bench-time">21.4 s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-fast" style="width:48%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Robocopy</span><span class="bench-time">14.2 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-rcopy" style="width:32%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Robocopy</span><span class="bench-time">14.2 s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-rcopy" style="width:32%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">TeraCopy</span><span class="bench-time">2.1 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-tera" style="width:5%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">TeraCopy</span><span class="bench-time">2.1 s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-tera" style="width:5%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">406&times; vs Explorer</span></span><span class="bench-time">0.11 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-robo" style="width:1%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">406&times; vs
+                Explorer</span></span><span class="bench-time">0.11 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-robo" style="width:1%"></div>
+          </div>
         </div>
-        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">110 ms regardless of file count or total size &mdash; no file data is read or written.</p>
+        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">110 ms regardless of file count or total size
+          &mdash; no file data is read or written.</p>
       </div>
 
       <div class="bench-card">
         <h3>Move &mdash; Large Files &mdash; 5 &times; 512 MB</h3>
-        <p class="bench-meta">SSD &rarr; SSD &nbsp;&middot;&nbsp; same-volume &nbsp;&middot;&nbsp; lower is better &nbsp;&middot;&nbsp; median of 3 runs</p>
+        <p class="bench-meta">SSD &rarr; SSD &nbsp;&middot;&nbsp; same-volume &nbsp;&middot;&nbsp; lower is better
+          &nbsp;&middot;&nbsp; median of 3 runs</p>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">FastCopy</span><span class="bench-time">9.1 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-fast" style="width:100%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">FastCopy</span><span class="bench-time">9.1 s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-fast" style="width:100%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Robocopy</span><span class="bench-time">7.1 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-rcopy" style="width:77%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Robocopy</span><span class="bench-time">7.1 s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-rcopy" style="width:77%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">TeraCopy</span><span class="bench-time">2.1 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-tera" style="width:23%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">TeraCopy</span><span class="bench-time">2.1 s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-tera" style="width:23%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Windows Explorer</span><span class="bench-time">0.23 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-win" style="width:3%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Windows Explorer</span><span class="bench-time">0.23
+              s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-win" style="width:3%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">23&times; vs Explorer</span></span><span class="bench-time">0.01 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-robo" style="width:1%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">23&times; vs
+                Explorer</span></span><span class="bench-time">0.01 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-robo" style="width:1%"></div>
+          </div>
         </div>
-        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">10 ms to move 2.56 GB &mdash; file size is irrelevant on same-volume moves.</p>
+        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">10 ms to move 2.56 GB &mdash; file size is
+          irrelevant on same-volume moves.</p>
       </div>
 
       <div class="bench-card">
         <h3>Move &mdash; Mixed Workload &mdash; 3,000 files &middot; 380 MB</h3>
-        <p class="bench-meta">SSD &rarr; SSD &nbsp;&middot;&nbsp; same-volume &nbsp;&middot;&nbsp; lower is better &nbsp;&middot;&nbsp; median of 3 runs</p>
+        <p class="bench-meta">SSD &rarr; SSD &nbsp;&middot;&nbsp; same-volume &nbsp;&middot;&nbsp; lower is better
+          &nbsp;&middot;&nbsp; median of 3 runs</p>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">FastCopy</span><span class="bench-time">9.1 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-fast" style="width:100%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">FastCopy</span><span class="bench-time">9.1 s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-fast" style="width:100%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Windows Explorer</span><span class="bench-time">4.8 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-win" style="width:52%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Windows Explorer</span><span class="bench-time">4.8
+              s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-win" style="width:52%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Robocopy</span><span class="bench-time">3.1 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-rcopy" style="width:34%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Robocopy</span><span class="bench-time">3.1 s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-rcopy" style="width:34%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">TeraCopy</span><span class="bench-time">1.0 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-tera" style="width:11%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">TeraCopy</span><span class="bench-time">1.0 s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-tera" style="width:11%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">68&times; vs Explorer</span></span><span class="bench-time">0.07 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-robo" style="width:1%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">68&times; vs
+                Explorer</span></span><span class="bench-time">0.07 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-robo" style="width:1%"></div>
+          </div>
         </div>
-        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">70 ms for 3,000 mixed files &mdash; scales to any tree size.</p>
+        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">70 ms for 3,000 mixed files &mdash; scales to any
+          tree size.</p>
       </div>
 
       <!-- ── MOVE HDD→HDD ── -->
 
       <div class="bench-card">
         <h3>Move &mdash; Small Files &mdash; 8,000 files &middot; 530 MB</h3>
-        <p class="bench-meta">HDD &rarr; HDD &nbsp;&middot;&nbsp; 7200 RPM &nbsp;&middot;&nbsp; same-volume &nbsp;&middot;&nbsp; lower is better &nbsp;&middot;&nbsp; median of 3 runs</p>
+        <p class="bench-meta">HDD &rarr; HDD &nbsp;&middot;&nbsp; 7200 RPM &nbsp;&middot;&nbsp; same-volume
+          &nbsp;&middot;&nbsp; lower is better &nbsp;&middot;&nbsp; median of 3 runs</p>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">FastCopy</span><span class="bench-time">2m 06s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-fast" style="width:100%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">FastCopy</span><span class="bench-time">2m 06s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-fast" style="width:100%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Robocopy</span><span class="bench-time">1m 55s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-rcopy" style="width:91%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Robocopy</span><span class="bench-time">1m 55s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-rcopy" style="width:91%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Windows Explorer</span><span class="bench-time">44.3 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-win" style="width:35%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Windows Explorer</span><span class="bench-time">44.3
+              s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-win" style="width:35%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">TeraCopy</span><span class="bench-time">3.1 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-tera" style="width:2%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">TeraCopy</span><span class="bench-time">3.1 s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-tera" style="width:2%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">32&times; vs Explorer</span></span><span class="bench-time">1.4 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-robo" style="width:1%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">32&times; vs
+                Explorer</span></span><span class="bench-time">1.4 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-robo" style="width:1%"></div>
+          </div>
         </div>
-        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">No file data is read or written on spinning disk &mdash; 8,000 files in 1.4 s.</p>
+        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">No file data is read or written on spinning disk
+          &mdash; 8,000 files in 1.4 s.</p>
       </div>
 
       <div class="bench-card">
         <h3>Move &mdash; Large Files &mdash; 5 &times; 512 MB</h3>
-        <p class="bench-meta">HDD &rarr; HDD &nbsp;&middot;&nbsp; 7200 RPM &nbsp;&middot;&nbsp; same-volume &nbsp;&middot;&nbsp; lower is better &nbsp;&middot;&nbsp; median of 3 runs</p>
+        <p class="bench-meta">HDD &rarr; HDD &nbsp;&middot;&nbsp; 7200 RPM &nbsp;&middot;&nbsp; same-volume
+          &nbsp;&middot;&nbsp; lower is better &nbsp;&middot;&nbsp; median of 3 runs</p>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Robocopy</span><span class="bench-time">1m 15s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-rcopy" style="width:100%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Robocopy</span><span class="bench-time">1m 15s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-rcopy" style="width:100%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">FastCopy</span><span class="bench-time">56.6 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-fast" style="width:68%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">FastCopy</span><span class="bench-time">56.6 s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-fast" style="width:68%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">TeraCopy</span><span class="bench-time">1.1 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-tera" style="width:1%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">TeraCopy</span><span class="bench-time">1.1 s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-tera" style="width:1%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Windows Explorer</span><span class="bench-time">0.27 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-win" style="width:1%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Windows Explorer</span><span class="bench-time">0.27
+              s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-win" style="width:1%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">9&times; vs Explorer</span></span><span class="bench-time">0.03 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-robo" style="width:1%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">9&times; vs
+                Explorer</span></span><span class="bench-time">0.03 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-robo" style="width:1%"></div>
+          </div>
         </div>
-        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">30 ms to move 2.56 GB on HDD &mdash; copy-based tools take minutes for the same job.</p>
+        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">30 ms to move 2.56 GB on HDD &mdash; copy-based
+          tools take minutes for the same job.</p>
       </div>
 
       <div class="bench-card">
         <h3>Move &mdash; Mixed Workload &mdash; 3,000 files &middot; 380 MB</h3>
-        <p class="bench-meta">HDD &rarr; HDD &nbsp;&middot;&nbsp; 7200 RPM &nbsp;&middot;&nbsp; same-volume &nbsp;&middot;&nbsp; lower is better &nbsp;&middot;&nbsp; median of 3 runs</p>
+        <p class="bench-meta">HDD &rarr; HDD &nbsp;&middot;&nbsp; 7200 RPM &nbsp;&middot;&nbsp; same-volume
+          &nbsp;&middot;&nbsp; lower is better &nbsp;&middot;&nbsp; median of 3 runs</p>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">FastCopy</span><span class="bench-time">1m 17s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-fast" style="width:100%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">FastCopy</span><span class="bench-time">1m 17s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-fast" style="width:100%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Robocopy</span><span class="bench-time">58.7 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-rcopy" style="width:76%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Robocopy</span><span class="bench-time">58.7 s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-rcopy" style="width:76%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Windows Explorer</span><span class="bench-time">18.4 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-win" style="width:24%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Windows Explorer</span><span class="bench-time">18.4
+              s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-win" style="width:24%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">TeraCopy</span><span class="bench-time">2.1 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-tera" style="width:3%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">TeraCopy</span><span class="bench-time">2.1 s</span>
+          </div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-tera" style="width:3%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">~11&times; vs Explorer</span></span><span class="bench-time">1.7 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-robo" style="width:2%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">~11&times; vs
+                Explorer</span></span><span class="bench-time">1.7 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-robo" style="width:2%"></div>
+          </div>
         </div>
-        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Time doesn&rsquo;t scale with file count or size &mdash; consistent across any workload mix.</p>
+        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Time doesn&rsquo;t scale with file count or size
+          &mdash; consistent across any workload mix.</p>
       </div>
 
       <!-- ── RECYCLE DELETE SSD ── -->
@@ -1925,86 +2029,131 @@
         <h3>Recycle-Bin Delete &mdash; Small Files &mdash; 8,000 files &middot; 530 MB</h3>
         <p class="bench-meta">SSD &nbsp;&middot;&nbsp; lower is better &nbsp;&middot;&nbsp; median of 3 runs</p>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Windows Explorer (Recycle Bin)</span><span class="bench-time">5.9 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-win" style="width:100%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Windows Explorer (Recycle Bin)</span><span
+              class="bench-time">5.9 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-win" style="width:100%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">2.7&times; vs Explorer</span></span><span class="bench-time">2.2 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-robo" style="width:37%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">2.7&times; vs
+                Explorer</span></span><span class="bench-time">2.2 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-robo" style="width:37%"></div>
+          </div>
         </div>
-        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Gains scale with file count &mdash; the more files, the bigger the advantage.</p>
+        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Gains scale with file count &mdash; the more files,
+          the bigger the advantage.</p>
       </div>
 
       <div class="bench-card">
         <h3>Recycle-Bin Delete &mdash; Large Files &mdash; 5 &times; 512 MB</h3>
         <p class="bench-meta">SSD &nbsp;&middot;&nbsp; lower is better &nbsp;&middot;&nbsp; median of 3 runs</p>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Windows Explorer (Recycle Bin)</span><span class="bench-time">1.3 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-win" style="width:100%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Windows Explorer (Recycle Bin)</span><span
+              class="bench-time">1.3 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-win" style="width:100%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">66&times; vs Explorer</span></span><span class="bench-time">0.02 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-robo" style="width:2%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">66&times; vs
+                Explorer</span></span><span class="bench-time">0.02 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-robo" style="width:2%"></div>
+          </div>
         </div>
-        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">20 ms to recycle 2.56 GB &mdash; single-operation recycle minimises shell overhead for large files.</p>
+        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">20 ms to recycle 2.56 GB &mdash; single-operation
+          recycle minimises shell overhead for large files.</p>
       </div>
 
       <div class="bench-card">
         <h3>Recycle-Bin Delete &mdash; Mixed Workload &mdash; 3,000 files &middot; 380 MB</h3>
         <p class="bench-meta">SSD &nbsp;&middot;&nbsp; lower is better &nbsp;&middot;&nbsp; median of 3 runs</p>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Windows Explorer (Recycle Bin)</span><span class="bench-time">0.9 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-win" style="width:100%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Windows Explorer (Recycle Bin)</span><span
+              class="bench-time">0.9 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-win" style="width:100%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">2.6&times; vs Explorer</span></span><span class="bench-time">0.36 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-robo" style="width:39%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">2.6&times; vs
+                Explorer</span></span><span class="bench-time">0.36 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-robo" style="width:39%"></div>
+          </div>
         </div>
-        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Consistent recycle performance across any mix of file sizes.</p>
+        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Consistent recycle performance across any mix of
+          file sizes.</p>
       </div>
 
       <!-- ── RECYCLE DELETE HDD ── -->
 
       <div class="bench-card">
         <h3>Recycle-Bin Delete &mdash; Small Files &mdash; 8,000 files &middot; 530 MB</h3>
-        <p class="bench-meta">HDD &nbsp;&middot;&nbsp; 7200 RPM &nbsp;&middot;&nbsp; lower is better &nbsp;&middot;&nbsp; median of 3 runs</p>
+        <p class="bench-meta">HDD &nbsp;&middot;&nbsp; 7200 RPM &nbsp;&middot;&nbsp; lower is better
+          &nbsp;&middot;&nbsp; median of 3 runs</p>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Windows Explorer (Recycle Bin)</span><span class="bench-time">6.4 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-win" style="width:100%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Windows Explorer (Recycle Bin)</span><span
+              class="bench-time">6.4 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-win" style="width:100%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">1.5&times; vs Explorer</span></span><span class="bench-time">4.3 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-robo" style="width:67%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">1.5&times; vs
+                Explorer</span></span><span class="bench-time">4.3 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-robo" style="width:67%"></div>
+          </div>
         </div>
-        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Gains scale with file count &mdash; spinning disks benefit most from reduced per-file work.</p>
+        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Gains scale with file count &mdash; spinning disks
+          benefit most from reduced per-file work.</p>
       </div>
 
       <div class="bench-card">
         <h3>Recycle-Bin Delete &mdash; Large Files &mdash; 5 &times; 512 MB</h3>
-        <p class="bench-meta">HDD &nbsp;&middot;&nbsp; 7200 RPM &nbsp;&middot;&nbsp; lower is better &nbsp;&middot;&nbsp; median of 3 runs</p>
+        <p class="bench-meta">HDD &nbsp;&middot;&nbsp; 7200 RPM &nbsp;&middot;&nbsp; lower is better
+          &nbsp;&middot;&nbsp; median of 3 runs</p>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Windows Explorer (Recycle Bin)</span><span class="bench-time">1.6 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-win" style="width:100%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Windows Explorer (Recycle Bin)</span><span
+              class="bench-time">1.6 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-win" style="width:100%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">2.6&times; vs Explorer</span></span><span class="bench-time">0.63 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-robo" style="width:39%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">2.6&times; vs
+                Explorer</span></span><span class="bench-time">0.63 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-robo" style="width:39%"></div>
+          </div>
         </div>
-        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Large file recycling uses a single optimized operation, keeping overhead minimal.</p>
+        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Large file recycling uses a single optimized
+          operation, keeping overhead minimal.</p>
       </div>
 
       <div class="bench-card">
         <h3>Recycle-Bin Delete &mdash; Mixed Workload &mdash; 3,000 files &middot; 380 MB</h3>
-        <p class="bench-meta">HDD &nbsp;&middot;&nbsp; 7200 RPM &nbsp;&middot;&nbsp; lower is better &nbsp;&middot;&nbsp; median of 3 runs</p>
+        <p class="bench-meta">HDD &nbsp;&middot;&nbsp; 7200 RPM &nbsp;&middot;&nbsp; lower is better
+          &nbsp;&middot;&nbsp; median of 3 runs</p>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">Windows Explorer (Recycle Bin)</span><span class="bench-time">3.5 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-win" style="width:100%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">Windows Explorer (Recycle Bin)</span><span
+              class="bench-time">3.5 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-win" style="width:100%"></div>
+          </div>
         </div>
         <div class="bench-row">
-          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">1.4&times; vs Explorer</span></span><span class="bench-time">2.5 s</span></div>
-          <div class="bench-bar-bg"><div class="bench-bar b-robo" style="width:71%"></div></div>
+          <div class="bench-row-head"><span class="bench-tool">RoboExtension <span class="bench-win-tag">1.4&times; vs
+                Explorer</span></span><span class="bench-time">2.5 s</span></div>
+          <div class="bench-bar-bg">
+            <div class="bench-bar b-robo" style="width:71%"></div>
+          </div>
         </div>
-        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Consistent recycle speed on HDDs across all file size distributions.</p>
+        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Consistent recycle speed on HDDs across all file
+          size distributions.</p>
       </div>
       <!-- ── PERMANENT DELETE SSD ── -->
 
@@ -2151,7 +2300,8 @@
             <div class="bench-bar b-robo" style="width:43%"></div>
           </div>
         </div>
-        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Parallel delete engine makes spinning disks significantly faster on large file counts.</p>
+        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Parallel delete engine makes spinning disks
+          significantly faster on large file counts.</p>
       </div>
 
       <!-- ── PERMANENT DELETE HDD Large ── -->
@@ -2188,7 +2338,8 @@
             <div class="bench-bar b-robo" style="width:7%"></div>
           </div>
         </div>
-        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Parallel delete engine keeps spinning disks efficient even for large file deletions.</p>
+        <p style="font-size:0.72rem;color:#475569;margin-top:10px;">Parallel delete engine keeps spinning disks
+          efficient even for large file deletions.</p>
       </div>
 
       <!-- ── PERMANENT DELETE HDD Mixed ── -->
