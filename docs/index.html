@@ -1199,9 +1199,10 @@
             <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
           </svg></div>
         <h3>WSL Symlink Copy</h3>
-        <p>Windows Explorer cannot copy WSL paths that contain Linux directory symlinks — it silently produces an
-          incomplete result. RoboExtension uses WSL's own path resolver to enumerate all symlink targets before
-          scanning, then copies the full tree correctly. Essential for pnpm <code>node_modules</code> inside WSL.</p>
+        <p>Windows Explorer silently drops files when copying WSL paths that contain Linux directory symlinks,
+          producing an incomplete result with no error. RoboExtension resolves every symlink target through WSL's own
+          path resolver before scanning, so the full tree is copied correctly. Particularly useful for pnpm
+          <code>node_modules</code> inside WSL, where deep symlink graphs are the norm.</p>
       </div>
     </div>
   </section>
