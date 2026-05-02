@@ -23,12 +23,13 @@
 ::    -Resume            Keep existing rows not being re-run
 ::
 ::  Examples:
-::    Run-Benchmark-App.bat
-::    Run-Benchmark-App.bat -SsdPath C:\BenchTemp
-::    Run-Benchmark-App.bat -SsdPath C:\BenchTemp -HddPath D:\BenchTemp
-::    Run-Benchmark-App.bat -SsdPath C:\BenchTemp -Mode delete
-::    Run-Benchmark-App.bat -SsdPath C:\BenchTemp -Runs 5 -ToolFilter RoboExtension
-::    Run-Benchmark-App.bat -SsdPath C:\BenchTemp -HddPath D:\BenchTemp -Mode delete -Resume
+::    .\Run-Benchmark-App.bat
+::    .\Run-Benchmark-App.bat -SsdPath C:\BenchTemp
+::    .\Run-Benchmark-App.bat -SsdPath C:\BenchTemp -HddPath D:\BenchTemp
+::    .\Run-Benchmark-App.bat -SsdPath C:\BenchTemp -Mode delete
+::    .\Run-Benchmark-App.bat -SsdPath C:\BenchTemp -Runs 5 -ToolFilter RoboExtension
+::    .\Run-Benchmark-App.bat -SsdPath C:\BenchTemp -HddPath D:\BenchTemp -Mode delete -Resume
+::    .\Run-Benchmark-App.bat -SsdPath C:\BenchTemp -WslSource "\\wsl.localhost\Ubuntu-22.04\home\user\project"
 :: ============================================================
 
 setlocal EnableDelayedExpansion
@@ -50,6 +51,7 @@ set "SMALL_SRC="
 set "LARGE_SRC="
 set "FORCE_REGEN="
 set "RESUME="
+set "WSL_SRC="
 
 :parse_args
 if "%~1"=="" goto :args_done
@@ -66,6 +68,7 @@ if /I "%~1"=="-SmallFilesSource" ( set "SMALL_SRC=%~2"       & shift & shift & g
 if /I "%~1"=="-LargeFilesSource" ( set "LARGE_SRC=%~2"       & shift & shift & goto :parse_args )
 if /I "%~1"=="-ForceRegen"       ( set "FORCE_REGEN=1"       & shift         & goto :parse_args )
 if /I "%~1"=="-Resume"           ( set "RESUME=1"            & shift         & goto :parse_args )
+if /I "%~1"=="-WslSource"        ( set "WSL_SRC=%~2"         & shift & shift & goto :parse_args )
 echo  Unknown argument: %~1 & exit /b 1
 
 :: Filter accumulators: re-join tokens that were split by cmd.exe on commas
@@ -109,10 +112,7 @@ set "ROBO_EXE="
 
 :: Try common locations: relative publish\, dist\, installed paths
 for %%P in (
-    "%SCRIPT_DIR%..\..\publish\RoboExtension.exe"
-    "%SCRIPT_DIR%..\..\dist\RoboExtension.exe"
     "%ProgramFiles%\RoboExtension\RoboExtension.exe"
-    "%LocalAppData%\Programs\RoboExtension\RoboExtension.exe"
 ) do (
     if exist %%P (
         set "ROBO_EXE=%%~fP"
@@ -159,6 +159,7 @@ if %errorlevel% neq 0 (
         echo if ^('!LARGE_SRC!'^)       { $p.LargeFilesSource = '!LARGE_SRC!' }
         echo if ^('!FORCE_REGEN!'^)     { $p.ForceRegen       = $true }
         echo if ^('!RESUME!'^)          { $p.Resume         = $true }
+        echo if ^('!WSL_SRC!'^)         { $p.WslSource       = '!WSL_SRC!' }
         echo ^& '!SCRIPT_DIR!Run-Benchmark-App.ps1' @p
     ) > "!_TMP!"
     powershell -NoProfile -Command "Start-Process powershell -ArgumentList '-NoProfile -ExecutionPolicy Bypass -NoExit -File ""!_TMP!""' -Verb RunAs -Wait"
@@ -179,6 +180,7 @@ if not "%SMALL_SRC%"==""       set "PS_ARGS=%PS_ARGS% -SmallFilesSource "%SMALL_
 if not "%LARGE_SRC%"==""       set "PS_ARGS=%PS_ARGS% -LargeFilesSource "%LARGE_SRC%""
 if defined FORCE_REGEN         set "PS_ARGS=%PS_ARGS% -ForceRegen"
 if defined RESUME              set "PS_ARGS=%PS_ARGS% -Resume"
+if not "%WSL_SRC%"==""        set "PS_ARGS=%PS_ARGS% -WslSource "%WSL_SRC%""
 
 echo.
 echo  ================================================================
@@ -196,6 +198,7 @@ if not "%COMBO_FILTER%"==""    echo   Combo    : %COMBO_FILTER%
 if not "%TOOL_FILTER%"==""     echo   Tools    : %TOOL_FILTER%
 if not "%SMALL_SRC%"==""       echo   SmallSrc : %SMALL_SRC%
 if not "%LARGE_SRC%"==""       echo   LargeSrc : %LARGE_SRC%
+if not "%WSL_SRC%"==""         echo   WslSource: %WSL_SRC%
 echo   Output   : %SCRIPT_DIR%results-app.json
 echo  ================================================================
 echo.

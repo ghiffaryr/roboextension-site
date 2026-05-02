@@ -79,10 +79,12 @@ param(
     [string]$ToolFilter     = '',
 
     # Controls which sections are executed:
-    #   full   (default) - run copy benchmark then delete benchmark
-    #   copy             - run copy benchmark only
-    #   delete           - run delete benchmark only
-    [ValidateSet('full','copy','delete')]
+    #   full     (default) - run copy, move, permanent-delete, recycle-delete
+    #   copy               - run copy benchmark only
+    #   move               - run move benchmark only
+    #   delete             - run permanent-delete benchmark only
+    #   recycle            - run recycle-bin delete benchmark only
+    [ValidateSet('full','copy','move','delete','recycle')]
     [string]$Mode = 'full',
 
     # When set, loads existing results from OutputJson and preserves all rows
@@ -90,12 +92,22 @@ param(
     #   -Mode delete -Resume  ->  copy rows preserved, delete rows re-run
     #   -Mode copy   -Resume  ->  delete rows preserved, copy rows re-run
     #   -Mode full   -Resume  ->  nothing preserved (full fresh run)
-    [switch]$Resume
+    [switch]$Resume,
+
+    # Optional: a WSL UNC path (e.g. \\wsl.localhost\Ubuntu-22.04\home\user\project).
+    # When provided, runs a WSL->SSD copy benchmark with robocopy and RoboExtension.
+    # Explorer / TeraCopy / FastCopy are skipped (unreliable with WSL UNC paths).
+    [string]$WslSource = ''
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 if (-not $OutputJson) { $OutputJson = Join-Path $PSScriptRoot 'results-app.json' }
+
+$runCopy    = $Mode -in @('full','copy')
+$runMove    = $Mode -in @('full','move')
+$runDelete  = $Mode -in @('full','delete')
+$runRecycle = $Mode -in @('full','recycle')
 
 # ---------------------------------------------------------------------------
 # Elevation check - required for page-cache flush
@@ -164,7 +176,10 @@ using System;
 using System.Runtime.InteropServices;
 public static class WinShell {
     const uint   FO_COPY            = 2;
+    const uint   FO_DELETE          = 3;
+    const uint   FO_MOVE            = 1;
     const ushort FOF_SILENT         = 0x0004;
+    const ushort FOF_ALLOWUNDO      = 0x0040;
     const ushort FOF_NOCONFIRMATION = 0x0010;
     const ushort FOF_NOERRORUI      = 0x0400;
     const ushort FOF_NOCONFIRMMKDIR = 0x0200;
@@ -186,6 +201,26 @@ public static class WinShell {
         };
         int r = SHFileOperation(ref op);
         if (r != 0) throw new InvalidOperationException("SHFileOperation error: 0x" + r.ToString("X"));
+    }
+    public static void MoveContents(string src, string dest) {
+        var op = new SHFILEOPSTRUCT {
+            wFunc  = FO_MOVE,
+            pFrom  = src.TrimEnd('\\') + "\\*\0",
+            pTo    = dest.TrimEnd('\\') + "\0",
+            fFlags = FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR
+        };
+        int r = SHFileOperation(ref op);
+        if (r != 0) throw new InvalidOperationException("SHFileOperation move error: 0x" + r.ToString("X"));
+    }
+    public static void RecycleDelete(string path) {
+        var op = new SHFILEOPSTRUCT {
+            wFunc  = FO_DELETE,
+            pFrom  = path.TrimEnd('\\') + "\0\0",
+            pTo    = null,
+            fFlags = FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_ALLOWUNDO
+        };
+        int r = SHFileOperation(ref op);
+        if (r != 0) throw new InvalidOperationException("SHFileOperation recycle delete error: 0x" + r.ToString("X"));
     }
 }
 '@
@@ -254,11 +289,43 @@ function Get-FolderSize([string]$path) {
 function Format-Secs([double]$s) {
     if ([double]::IsNaN($s) -or $s -le 0) { return 'N/A' }
     if ($s -lt 60) { return ('{0:F1} s' -f $s) }
-    '{0}m {1}s' -f [int]($s/60), [int]($s % 60)
+    $m = [Math]::Floor($s / 60); '{0}m {1}s' -f $m, [int]($s - $m * 60)
 }
 function Format-MBps([long]$bytes, [double]$s) {
     if ([double]::IsNaN($s) -or $s -le 0) { return 'N/A' }
     '{0:F1} MB/s' -f ($bytes / $s / 1MB)
+}
+
+# Returns @{ DriveLetter='C'; IsSsd=$true; Label='SSD' } or $null if registry miss.
+# Mirrors DriveDetector.FindWslBasePath + QueryIsSsd logic.
+function Get-WslVhdxInfo([string]$wslPath) {
+    $parts = $wslPath.TrimStart('\') -split '\\'
+    if ($parts.Count -lt 2) { return $null }
+    $distroName = $parts[1]
+    $basePath = $null
+    try {
+        $lxss = Get-ChildItem 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Lxss' -ErrorAction Stop
+        foreach ($key in $lxss) {
+            $props = Get-ItemProperty $key.PSPath -ErrorAction SilentlyContinue
+            if ($props -and $props.DistributionName -ieq $distroName) { $basePath = $props.BasePath; break }
+        }
+    } catch {}
+    if (-not $basePath -or $basePath.Length -lt 1) { return $null }
+    $dl = [char]::ToUpper($basePath[0])
+    if ($dl -lt 'A' -or $dl -gt 'Z') { return $null }
+    $isSsd = $true  # default: treat as SSD if WMI fails
+    try {
+        $assoc = Get-WmiObject -Query "ASSOCIATORS OF {Win32_LogicalDisk.DeviceID='${dl}:'} WHERE AssocClass=Win32_LogicalDiskToPartition" -ErrorAction Stop
+        foreach ($part in @($assoc)) {
+            $driveAssoc = Get-WmiObject -Query "ASSOCIATORS OF {Win32_DiskPartition.DeviceID='$($part.DeviceID)'} WHERE AssocClass=Win32_DiskDriveToDiskPartition" -ErrorAction Stop
+            foreach ($drive in @($driveAssoc)) {
+                $pd = Get-WmiObject -Namespace root\microsoft\windows\storage -Class MSFT_PhysicalDisk -Filter "DeviceId='$([int]$drive.Index)'" -ErrorAction Stop
+                if ($pd) { $isSsd = ($pd.MediaType -eq 4); break }  # 4=SSD, 3=HDD
+            }
+            break
+        }
+    } catch {}
+    return @{ DriveLetter = $dl; IsSsd = $isSsd; Label = if ($isSsd) { 'SSD' } else { 'HDD' } }
 }
 
 # ---------------------------------------------------------------------------
@@ -379,20 +446,78 @@ function Invoke-Explorer([string]$src, [string]$dst) {
     [WinShell]::CopyContents($src, $dst)
 }
 
-function Invoke-RoboCopy([string]$src, [string]$dst) {
+function Invoke-ExplorerMove([string]$src, [string]$dst) {
+    [WinShell]::MoveContents($src, $dst)
+}
+
+function Invoke-ExplorerRecycleDelete([string]$folder) {
+    [WinShell]::RecycleDelete($folder)
+}
+
+function Invoke-RoboCopy([string]$src, [string]$dst, [int]$mt = 0) {
+    $args = @("`"$src`"", "`"$dst`"", '/E', '/R:0', '/W:0', '/NJH', '/NJS', '/NP')
+    if ($mt -gt 0) { $args += "/MT:$mt" }
     $p = Start-Process robocopy `
-        -ArgumentList "`"$src`"", "`"$dst`"", '/E', '/R:0', '/W:0', '/NJH', '/NJS', '/NP' `
+        -ArgumentList $args `
         -PassThru -Wait -WindowStyle Hidden
     if ($p.ExitCode -ge 8) { throw "robocopy exit=$($p.ExitCode)" }
 }
 
+function Invoke-RoboExtensionTray([string]$verb, [string[]]$paths, [string[]]$flags = @()) {
+    $pipeName = 'RoboExtension_IPC'
+    $pipe = [System.IO.Pipes.NamedPipeClientStream]::new(
+        '.', $pipeName,
+        [System.IO.Pipes.PipeDirection]::InOut,
+        [System.IO.Pipes.PipeOptions]::None)
+    try {
+        $pipe.Connect(2000)
+        $sb = [System.Text.StringBuilder]::new()
+        [void]$sb.AppendLine($verb)
+        foreach ($f in $flags) { [void]$sb.AppendLine($f) }
+        foreach ($p in $paths) { [void]$sb.AppendLine($p) }
+        [void]$sb.AppendLine('END')
+        $req = [System.Text.Encoding]::UTF8.GetBytes($sb.ToString())
+        $pipe.Write($req, 0, $req.Length)
+
+        $replyBuf = [byte[]]::new(8)
+        $n = $pipe.Read($replyBuf, 0, $replyBuf.Length)
+        $reply = [System.Text.Encoding]::UTF8.GetString($replyBuf, 0, $n).Trim()
+        if ($reply -ne '0') { throw "tray returned status '$reply'" }
+    }
+    finally {
+        $pipe.Dispose()
+    }
+}
+
 # Black-box: invokes the real installed binary WITH progress UI (dst must not pre-exist so isDirect fires without --silent).
 function Invoke-RoboExtension([string]$exe, [string]$src, [string]$dst) {
+    # Keep one execution path for stability: when tray is available, call IPC directly
+    # instead of sometimes delegating/sometimes falling back via a short-lived process.
+    if ($null -ne $script:TrayProcess -and -not $script:TrayProcess.HasExited) {
+        Invoke-RoboExtensionTray 'copy' @($src, $dst)
+        return
+    }
+
     # -PassThru + WaitForExit() instead of -Wait: avoids WaitForInputIdle() which adds
     # ~500ms for GUI-subsystem binaries before the engine even starts.
     $p = Start-Process $exe -ArgumentList @('copy', "`"$src`"", "`"$dst`"") -PassThru -WindowStyle Normal
     $p.WaitForExit()
     if ($p.ExitCode -ne 0) { throw "RoboExtension copy exit=$($p.ExitCode)" }
+}
+
+function Invoke-RoboExtensionMove([string]$exe, [string]$src, [string]$dst) {
+    if ($null -ne $script:TrayProcess -and -not $script:TrayProcess.HasExited) {
+        Invoke-RoboExtensionTray 'move' @($src, $dst)
+        return
+    }
+
+    $pCut = Start-Process $exe -ArgumentList @('cut', "`"$src`"") -PassThru -WindowStyle Normal
+    $pCut.WaitForExit()
+    if ($pCut.ExitCode -ne 0) { throw "RoboExtension cut exit=$($pCut.ExitCode)" }
+
+    $pPaste = Start-Process $exe -ArgumentList @('paste', "`"$dst`"") -PassThru -WindowStyle Normal
+    $pPaste.WaitForExit()
+    if ($pPaste.ExitCode -ne 0) { throw "RoboExtension paste exit=$($pPaste.ExitCode)" }
 }
 
 function Invoke-TeraCopy([string]$exe, [string]$src, [string]$dst) {
@@ -410,6 +535,27 @@ function Invoke-FastCopy([string]$exe, [string]$src, [string]$dst) {
     if ($p.ExitCode -ne 0 -and $p.ExitCode -ne 1) { throw "FastCopy exit=$($p.ExitCode)" }
 }
 
+function Invoke-RoboCopyMove([string]$src, [string]$dst, [int]$threads = 0) {
+    $args = @("`"$src`"", "`"$dst`"", '/E', '/R:0', '/W:0', '/NFL', '/NDL', '/NJH', '/NJS', '/MOVE')
+    if ($threads -gt 0) { $args += "/MT:$threads" }
+    $p = Start-Process robocopy -ArgumentList $args -PassThru -Wait -WindowStyle Hidden
+    if ($p.ExitCode -ge 8) { throw "robocopy move exit=$($p.ExitCode)" }
+}
+
+function Invoke-TeraCopyMove([string]$exe, [string]$src, [string]$dst) {
+    $p = Start-Process $exe `
+        -ArgumentList 'Move', "`"$src`"", "`"$dst`"", '/Wait', '/Close', '/SkipAll' `
+        -PassThru -Wait -WindowStyle Normal
+    if ($p.ExitCode -ne 0) { throw "TeraCopy move exit=$($p.ExitCode)" }
+}
+
+function Invoke-FastCopyMove([string]$exe, [string]$src, [string]$dst) {
+    $p = Start-Process $exe `
+        -ArgumentList '/cmd=move', '/no_ui', '/auto_close', '/bufsize=256M', "`"$src`"", "/to=`"$dst\`"" `
+        -PassThru -Wait -WindowStyle Hidden
+    if ($p.ExitCode -ne 0 -and $p.ExitCode -ne 1) { throw "FastCopy move exit=$($p.ExitCode)" }
+}
+
 # cmd /C del: Explorer-equivalent single-threaded delete
 function Invoke-CmdDel([string]$folder) {
     $p = Start-Process cmd -ArgumentList '/C', "del /F /S /Q `"$folder`" > nul 2>&1 && rd /S /Q `"$folder`"" `
@@ -425,11 +571,27 @@ function Invoke-PSDelete([string]$folder) {
 
 # Black-box: invokes the real delete engine WITH progress UI, skipping only the confirm dialog.
 function Invoke-RoboExtensionDelete([string]$exe, [string]$folder) {
+    if ($null -ne $script:TrayProcess -and -not $script:TrayProcess.HasExited) {
+        Invoke-RoboExtensionTray 'delete' @($folder) @('--f')
+        return
+    }
+
     # -PassThru + WaitForExit() instead of -Wait: avoids WaitForInputIdle() which adds
     # ~500ms for GUI-subsystem binaries before the engine even starts.
     $p = Start-Process $exe -ArgumentList @('delete', "`"$folder`"", '--f', '--yes') -PassThru -WindowStyle Normal
     $p.WaitForExit()
     if ($p.ExitCode -ne 0) { throw "RoboExtension delete --f exit=$($p.ExitCode)" }
+}
+
+function Invoke-RoboExtensionRecycleDelete([string]$exe, [string]$folder) {
+    if ($null -ne $script:TrayProcess -and -not $script:TrayProcess.HasExited) {
+        Invoke-RoboExtensionTray 'delete' @($folder)
+        return
+    }
+
+    $p = Start-Process $exe -ArgumentList @('delete', "`"$folder`"", '--yes') -PassThru -WindowStyle Normal
+    $p.WaitForExit()
+    if ($p.ExitCode -ne 0) { throw "RoboExtension delete (recycle) exit=$($p.ExitCode)" }
 }
 
 # FastCopy
@@ -477,6 +639,7 @@ function Measure-Delete([string]$toolId, [string]$toolExe, [string]$src, [string
     try {
         switch ($toolId) {
             'windows'       { Invoke-CmdDel              $tmp }
+            'powershell'    { Invoke-PSDelete            $tmp }
             'roboextension' { Invoke-RoboExtensionDelete  $toolExe $tmp }
             'fastcopy'      { Invoke-FastCopyDelete       $toolExe $tmp }
         }
@@ -487,12 +650,59 @@ function Measure-Delete([string]$toolId, [string]$toolExe, [string]$src, [string
     return $sw.Elapsed.TotalSeconds
 }
 
+# Timed measurement (move): copies src to a temp source folder then moves it
+function Measure-Move([string]$toolId, [string]$toolExe, [string]$src, [string]$workspace) {
+    $tmpSrc = Join-Path $workspace "mv_src_$toolId"
+    $tmpDst = Join-Path $workspace "mv_dst_$toolId"
+    if (Test-Path $tmpSrc) { Remove-Item -LiteralPath $tmpSrc -Recurse -Force }
+    if (Test-Path $tmpDst) { Remove-Item -LiteralPath $tmpDst -Recurse -Force }
+
+    Invoke-RoboCopy $src $tmpSrc
+    Clear-PageCache
+
+    $sw = [System.Diagnostics.Stopwatch]::StartNew()
+    try {
+        switch ($toolId) {
+            'explorer'      { Invoke-ExplorerMove         $tmpSrc $tmpDst }
+            'robocopy'      { Invoke-RoboCopyMove         $tmpSrc $tmpDst }
+            'roboextension' { Invoke-RoboExtensionMove    $toolExe $tmpSrc $tmpDst }
+            'teracopy'      { Invoke-TeraCopyMove         $toolExe $tmpSrc $tmpDst }
+            'fastcopy'      { Invoke-FastCopyMove         $toolExe $tmpSrc $tmpDst }
+        }
+    } catch { $sw.Stop(); throw }
+    $sw.Stop()
+
+    if (Test-Path $tmpSrc) { Remove-Item -LiteralPath $tmpSrc -Recurse -Force -ErrorAction SilentlyContinue }
+    if (Test-Path $tmpDst) { Remove-Item -LiteralPath $tmpDst -Recurse -Force -ErrorAction SilentlyContinue }
+    return $sw.Elapsed.TotalSeconds
+}
+
+# Timed measurement (recycle delete): copies src to a temp folder then recycles that copy
+function Measure-RecycleDelete([string]$toolId, [string]$toolExe, [string]$src, [string]$workspace) {
+    $tmp = Join-Path $workspace "recycle_tmp_$toolId"
+    if (Test-Path $tmp) { Remove-Item -LiteralPath $tmp -Recurse -Force }
+    Invoke-RoboCopy $src $tmp
+    Clear-PageCache
+
+    $sw = [System.Diagnostics.Stopwatch]::StartNew()
+    try {
+        switch ($toolId) {
+            'explorer-recycle' { Invoke-ExplorerRecycleDelete      $tmp }
+            'roboextension'    { Invoke-RoboExtensionRecycleDelete $toolExe $tmp }
+        }
+    } catch { $sw.Stop(); throw }
+    $sw.Stop()
+
+    if (Test-Path $tmp) { Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue }
+    return $sw.Elapsed.TotalSeconds
+}
+
 # ---------------------------------------------------------------------------
 # Build tool list
 # ---------------------------------------------------------------------------
 $toolList = [System.Collections.Specialized.OrderedDictionary]::new()
 $toolList['Windows Explorer']         = [pscustomobject]@{ Id='explorer';      Exe='' }
-$toolList['Robocopy (plain /E)']      = [pscustomobject]@{ Id='robocopy';      Exe='' }
+$toolList['Robocopy']                 = [pscustomobject]@{ Id='robocopy';      Exe='' }
 $toolList['RoboExtension (adaptive)'] = [pscustomobject]@{ Id='roboextension'; Exe=$roboExePath }
 if ($teraExe) { $toolList['TeraCopy'] = [pscustomobject]@{ Id='teracopy'; Exe=$teraExe } }
 if ($fastExe)  { $toolList['FastCopy'] = [pscustomobject]@{ Id='fastcopy';  Exe=$fastExe  } }
@@ -536,12 +746,29 @@ foreach ($sc in $scenarioMeta) {
 # Delete tools (ordered): cmd del, PowerShell, FastCopy delete, RoboExtension
 $deleteToolList = [System.Collections.Specialized.OrderedDictionary]::new()
 $deleteToolList['Windows Explorer (Shift+Del)'] = [pscustomobject]@{ Id='windows';       Exe='' }
+$deleteToolList['PowerShell Remove-Item']       = [pscustomobject]@{ Id='powershell';    Exe='' }
 if ($fastExe) { $deleteToolList['FastCopy'] = [pscustomobject]@{ Id='fastcopy'; Exe=$fastExe } }
 $deleteToolList['RoboExtension'] = [pscustomobject]@{ Id='roboextension'; Exe=$roboExePath }
+
+# Move tools: same lineup as copy benchmark.
+$moveToolList = [System.Collections.Specialized.OrderedDictionary]::new()
+foreach ($k in $toolList.Keys) { $moveToolList[$k] = $toolList[$k] }
+
+# Recycle-bin delete tools (only tools with explicit recycle semantics).
+$recycleToolList = [System.Collections.Specialized.OrderedDictionary]::new()
+$recycleToolList['Windows Explorer (Recycle Bin)'] = [pscustomobject]@{ Id='explorer-recycle'; Exe='' }
+$recycleToolList['RoboExtension (Recycle Bin)']    = [pscustomobject]@{ Id='roboextension';    Exe=$roboExePath }
+
 if ($ToolFilter) {
     $tfTokens = $ToolFilter -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
     $keysToRemove = @($deleteToolList.Keys | Where-Object { $dk = $_; -not ($tfTokens | Where-Object { $dk -like "*$_*" }) })
     foreach ($dk in $keysToRemove) { $deleteToolList.Remove($dk) }
+
+    $moveKeysToRemove = @($moveToolList.Keys | Where-Object { $mk = $_; -not ($tfTokens | Where-Object { $mk -like "*$_*" }) })
+    foreach ($mk in $moveKeysToRemove) { $moveToolList.Remove($mk) }
+
+    $recycleKeysToRemove = @($recycleToolList.Keys | Where-Object { $rk = $_; -not ($tfTokens | Where-Object { $rk -like "*$_*" }) })
+    foreach ($rk in $recycleKeysToRemove) { $recycleToolList.Remove($rk) }
 }
 
 # ---------------------------------------------------------------------------
@@ -554,16 +781,89 @@ if ($Resume -and (Test-Path $OutputJson)) {
     Write-Host "`n[INFO] Resume: loading existing results from $OutputJson" -ForegroundColor Cyan
     $existing = (Get-Content -Raw $OutputJson | ConvertFrom-Json).Results
     foreach ($r in $existing) {
-        $isDeleteRow = $r.Storage -like '*delete*'
-        # Keep delete rows when re-running copy; keep copy rows when re-running delete.
-        $keep = ($isDeleteRow -and $Mode -eq 'copy') -or
-                (-not $isDeleteRow -and $Mode -eq 'delete')
+        $op = if ($r.PSObject.Properties.Name -contains 'Operation') {
+            [string]$r.Operation
+        } elseif ($r.Storage -like '*recycle*') {
+            'delete-recycle'
+        } elseif ($r.Storage -like '*delete*') {
+            'delete-permanent'
+        } else {
+            'copy'
+        }
+        $keep = switch ($Mode) {
+            'copy'    { $op -ne 'copy' }
+            'move'    { $op -ne 'move' }
+            'delete'  { $op -ne 'delete-permanent' }
+            'recycle' { $op -ne 'delete-recycle' }
+            default   { $false }
+        }
         if ($keep) { $allResults.Add([pscustomobject]$r) }
     }
     Write-Host "[INFO] Loaded $($allResults.Count) preserved result(s)." -ForegroundColor DarkGray
 }
 
-if ($Mode -ne 'delete') { foreach ($combo in $combos) {
+# Warm tray before copy/move/recycle benchmarks so RoboExtension trials do not pay cold-start cost.
+if ($runCopy -or $runMove -or $runRecycle) {
+    $reInCopyList = $toolList.Keys | Where-Object { $_ -like '*RoboExtension*' }
+    if ($reInCopyList) {
+        if (-not (Get-Variable -Name TrayProcess -Scope Script -ErrorAction SilentlyContinue)) { $script:TrayProcess = $null }
+        if (-not (Get-Variable -Name StartedTrayHere -Scope Script -ErrorAction SilentlyContinue)) { $script:StartedTrayHere = $false }
+
+        $resolvedExe = try { (Resolve-Path -LiteralPath $roboExePath -ErrorAction Stop).Path } catch { $roboExePath }
+        $procName = [System.IO.Path]::GetFileNameWithoutExtension($resolvedExe)
+        $existing = $null
+        try {
+            $existing = Get-Process -Name $procName -ErrorAction SilentlyContinue |
+                Where-Object {
+                    try {
+                        $_.Path -and [string]::Equals($_.Path, $resolvedExe, [System.StringComparison]::OrdinalIgnoreCase)
+                    }
+                    catch { $false }
+                } |
+                Select-Object -First 1
+        } catch { }
+
+        if ($null -ne $existing -and -not $existing.HasExited) {
+            $script:TrayProcess = $existing
+            $script:StartedTrayHere = $false
+            Write-Host "  [tray] Already running (PID $($existing.Id)); reusing existing tray process for copy benchmark." -ForegroundColor DarkGray
+        }
+        else {
+            Write-Host '  [tray] Starting RoboExtension tray process for copy benchmark...' -ForegroundColor DarkGray
+            $script:TrayProcess = Start-Process $roboExePath -PassThru -WindowStyle Hidden
+            $script:StartedTrayHere = $true
+
+            $pipeName  = 'RoboExtension_IPC'
+            $deadline  = [DateTime]::UtcNow.AddSeconds(10)
+            $connected = $false
+            while ([DateTime]::UtcNow -lt $deadline) {
+                try {
+                    $pipe = [System.IO.Pipes.NamedPipeClientStream]::new('.', $pipeName,
+                        [System.IO.Pipes.PipeDirection]::InOut)
+                    $pipe.Connect(200)
+                    $pipe.Dispose()
+                    $connected = $true
+                    break
+                }
+                catch { Start-Sleep -Milliseconds 200 }
+            }
+
+            if (-not $connected) {
+                Write-Warning '[tray] Pipe not ready after 10s -- copy may still include cold-start cost.'
+            }
+            else {
+                $tmp = Join-Path $env:TEMP ("re_warmup_$(Get-Random)")
+                New-Item -ItemType Directory -Path $tmp -Force | Out-Null
+                $p = Start-Process $roboExePath -ArgumentList @('delete', "`"$tmp`"", '--f', '--yes') -PassThru -WindowStyle Hidden
+                $p.WaitForExit(5000) | Out-Null
+                if (Test-Path $tmp) { Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue }
+                Write-Host "  [tray] Ready (PID $($script:TrayProcess.Id), pipe warm) for copy benchmark." -ForegroundColor DarkGray
+            }
+        }
+    }
+}
+
+if ($runCopy) { foreach ($combo in $combos) {
     if ($ComboFilter) {
         $tokens  = $ComboFilter -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
         $matched = $false
@@ -581,58 +881,214 @@ if ($Mode -ne 'delete') { foreach ($combo in $combos) {
 
         Write-Host ("`n--- {0} ---" -f $sc.Label) -ForegroundColor Yellow
 
-        foreach ($kv in $toolList.GetEnumerator()) {
-            $toolName = $kv.Key
-            $toolMeta = $kv.Value
-            $dstDir   = Join-Path $combo.DstRoot "dst\$($sc.Name)_$($toolMeta.Id)"
+        # Order-balanced: rotate which tool runs first each round so no tool
+        # systematically benefits from warm/cold cache position.
+        $toolEntries = @($toolList.GetEnumerator())
+        $timesByTool = @{}
+        $errorByTool = @{}
+        foreach ($kv in $toolEntries) {
+            $timesByTool[$kv.Key] = [System.Collections.Generic.List[double]]::new()
+            $errorByTool[$kv.Key] = $false
+        }
+        $toolColWidth = 34
 
-            Write-Host ("  {0,-38}" -f $toolName) -NoNewline -ForegroundColor White
+        for ($run = 1; $run -le $Runs; $run++) {
+            $count = $toolEntries.Count
+            if ($count -eq 0) { break }
+            $shift = ($run - 1) % $count
+            if ($count -eq 1) {
+                $runOrder = @($toolEntries[0])
+            } elseif ($shift -eq 0) {
+                $runOrder = @($toolEntries)
+            } else {
+                $runOrder = @($toolEntries[$shift..($count - 1)] + $toolEntries[0..($shift - 1)])
+            }
 
-            $times   = [System.Collections.Generic.List[double]]::new()
-            $errored = $false
+            if ($run -gt 1) { Write-Host "" }
 
-            for ($run = 1; $run -le $Runs; $run++) {
-                Write-Host "[$run]" -NoNewline -ForegroundColor DarkGray
+            foreach ($kv in $runOrder) {
+                $toolName = $kv.Key
+                if ($errorByTool[$toolName]) { continue }
+                $toolMeta = $kv.Value
+                $dstDir   = Join-Path $combo.DstRoot "dst\$($sc.Name)_$($toolMeta.Id)"
                 try {
                     $t = Measure-Tool $toolMeta.Id $toolMeta.Exe $srcDir $dstDir
-                    $times.Add($t)
-                    Write-Host (" {0:F1}s" -f $t) -NoNewline -ForegroundColor Gray
+                    $timesByTool[$toolName].Add($t)
+                    Write-Host ("  [{0}] {1,-$toolColWidth} {2,6:F1}s  {3,11}" -f $run, $toolName, $t, (Format-MBps $bytes $t)) -ForegroundColor DarkGray
                 } catch {
-                    Write-Host " ERR" -NoNewline -ForegroundColor Red
-                    Write-Host (" ($_)") -ForegroundColor DarkRed
-                    $errored = $true
-                    break
+                    Write-Host ("  [{0}] {1,-$toolColWidth} ERR ({2})" -f $run, $toolName, $_) -ForegroundColor Red
+                    $errorByTool[$toolName] = $true
                 }
             }
+        }
 
-            if (-not $errored) {
-                $med = Median($times.ToArray())
-                Write-Host ("  -> {0}  {1}" -f (Format-Secs $med), (Format-MBps $bytes $med)) `
-                    -ForegroundColor Cyan
-                $allResults.Add([pscustomobject]@{
-                    Scenario   = $sc.Label
-                    Storage    = $combo.Label
-                    Tool       = $toolName
-                    Files      = @(Get-ChildItem -LiteralPath $srcDir -Recurse -File).Count
-                    TotalMB    = [Math]::Round($bytes / 1MB, 1)
-                    MedianSec  = [Math]::Round($med, 2)
-                    MBps       = [Math]::Round($bytes / $med / 1MB, 1)
-                    AllRunsSec = ($times | ForEach-Object { [Math]::Round($_, 2) }) -join ','
-                })
+        Write-Host ""
+        Write-Host "  Summary:" -ForegroundColor DarkGray
+        foreach ($kv in $toolEntries) {
+            $toolName = $kv.Key
+            $times    = $timesByTool[$toolName]
+            $errored  = $errorByTool[$toolName]
+
+            if ($errored -or $times.Count -eq 0) {
+                Write-Host ("  {0,-38} ERR" -f $toolName) -ForegroundColor Red
+                continue
             }
+
+            $parts = @()
+            for ($i = 0; $i -lt $times.Count; $i++) {
+                $parts += ("[{0}] {1,5:F1}s" -f ($i + 1), $times[$i])
+            }
+            $runText = $parts -join ' '
+            $runTextPadded = $runText.PadRight([Math]::Max(28, $Runs * 12))
+
+            $med = Median($times.ToArray())
+            Write-Host ("  {0,-$toolColWidth}" -f $toolName) -NoNewline -ForegroundColor White
+            Write-Host (" {0}" -f $runTextPadded) -NoNewline -ForegroundColor Gray
+            Write-Host ("  -> {0,6:F1}s  {1,7:F1} MB/s" -f $med, ($bytes / $med / 1MB)) -ForegroundColor Cyan
+
+            $allResults.Add([pscustomobject]@{
+                Operation  = 'copy'
+                Scenario   = $sc.Label
+                Storage    = $combo.Label
+                Tool       = $toolName
+                Files      = @(Get-ChildItem -LiteralPath $srcDir -Recurse -File).Count
+                TotalMB    = [Math]::Round($bytes / 1MB, 1)
+                MedianSec  = [Math]::Round($med, 2)
+                MBps       = [Math]::Round($bytes / $med / 1MB, 1)
+                AllRunsSec = ($times | ForEach-Object { [Math]::Round($_, 2) }) -join ','
+            })
         }
     }
-} } # end if ($Mode -ne 'delete')
+} } # end if ($runCopy)
+
+if ($runMove) { foreach ($combo in $combos) {
+    if ($ComboFilter) {
+        $tokens  = $ComboFilter -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+        $matched = $false
+        foreach ($tok in $tokens) { if ($combo.Label -like "*$tok*") { $matched = $true; break } }
+        if (-not $matched) { continue }
+    }
+
+    Write-Host ("`n`n=== MOVE BENCHMARK ({0}) ===" -f $combo.Label) -ForegroundColor Cyan
+
+    foreach ($sc in $scenarioMeta) {
+        if ($ScenarioFilter -and $sc.Name -notlike "*$ScenarioFilter*") { continue }
+
+        $srcDir = Join-Path $combo.SrcRoot "src\$($sc.Name)"
+        $bytes  = $scenBytes[$sc.Name]
+
+        Write-Host ("`n--- {0} ---" -f $sc.Label) -ForegroundColor Yellow
+
+        $toolEntries = @($moveToolList.GetEnumerator())
+        $timesByTool = @{}
+        $errorByTool = @{}
+        foreach ($kv in $toolEntries) {
+            $timesByTool[$kv.Key] = [System.Collections.Generic.List[double]]::new()
+            $errorByTool[$kv.Key] = $false
+        }
+        $toolColWidth = 34
+
+        for ($run = 1; $run -le $Runs; $run++) {
+            $count = $toolEntries.Count
+            if ($count -eq 0) { break }
+            $shift = ($run - 1) % $count
+            if ($count -eq 1) {
+                $runOrder = @($toolEntries[0])
+            } elseif ($shift -eq 0) {
+                $runOrder = @($toolEntries)
+            } else {
+                $runOrder = @($toolEntries[$shift..($count - 1)] + $toolEntries[0..($shift - 1)])
+            }
+
+            if ($run -gt 1) { Write-Host "" }
+
+            foreach ($kv in $runOrder) {
+                $toolName = $kv.Key
+                if ($errorByTool[$toolName]) { continue }
+                $toolMeta = $kv.Value
+                try {
+                    $t = Measure-Move $toolMeta.Id $toolMeta.Exe $srcDir $combo.DstRoot
+                    $timesByTool[$toolName].Add($t)
+                    Write-Host ("  [{0}] {1,-$toolColWidth} {2,6:F1}s  {3,11}" -f $run, $toolName, $t, (Format-MBps $bytes $t)) -ForegroundColor DarkGray
+                } catch {
+                    Write-Host ("  [{0}] {1,-$toolColWidth} ERR ({2})" -f $run, $toolName, $_) -ForegroundColor Red
+                    $errorByTool[$toolName] = $true
+                }
+            }
+        }
+
+        Write-Host ""
+        Write-Host "  Summary:" -ForegroundColor DarkGray
+        foreach ($kv in $toolEntries) {
+            $toolName = $kv.Key
+            $times    = $timesByTool[$toolName]
+            $errored  = $errorByTool[$toolName]
+
+            if ($errored -or $times.Count -eq 0) {
+                Write-Host ("  {0,-38} ERR" -f $toolName) -ForegroundColor Red
+                continue
+            }
+
+            $parts = @()
+            for ($i = 0; $i -lt $times.Count; $i++) {
+                $parts += ("[{0}] {1,5:F1}s" -f ($i + 1), $times[$i])
+            }
+            $runText = $parts -join ' '
+            $runTextPadded = $runText.PadRight([Math]::Max(28, $Runs * 12))
+
+            $med = Median($times.ToArray())
+            Write-Host ("  {0,-$toolColWidth}" -f $toolName) -NoNewline -ForegroundColor White
+            Write-Host (" {0}" -f $runTextPadded) -NoNewline -ForegroundColor Gray
+            Write-Host ("  -> {0,6:F1}s  {1,7:F1} MB/s" -f $med, ($bytes / $med / 1MB)) -ForegroundColor Cyan
+
+            $allResults.Add([pscustomobject]@{
+                Operation  = 'move'
+                Scenario   = $sc.Label
+                Storage    = $combo.Label
+                Tool       = $toolName
+                Files      = @(Get-ChildItem -LiteralPath $srcDir -Recurse -File).Count
+                TotalMB    = [Math]::Round($bytes / 1MB, 1)
+                MedianSec  = [Math]::Round($med, 2)
+                MBps       = [Math]::Round($bytes / $med / 1MB, 1)
+                AllRunsSec = ($times | ForEach-Object { [Math]::Round($_, 2) }) -join ','
+            })
+        }
+    }
+} } # end if ($runMove)
 
 # ---------------------------------------------------------------------------
 # Tray helper functions — start/stop/warm the RoboExtension tray process so
 # CLI invocations delegate over IPC instead of cold-starting each time.
 # ---------------------------------------------------------------------------
-$script:TrayProcess = $null
+if (-not (Get-Variable -Name TrayProcess -Scope Script -ErrorAction SilentlyContinue)) { $script:TrayProcess = $null }
+if (-not (Get-Variable -Name StartedTrayHere -Scope Script -ErrorAction SilentlyContinue)) { $script:StartedTrayHere = $false }
 
 function Start-RoboExtensionTray([string]$exe) {
+    $resolvedExe = try { (Resolve-Path -LiteralPath $exe -ErrorAction Stop).Path } catch { $exe }
+    $procName = [System.IO.Path]::GetFileNameWithoutExtension($resolvedExe)
+    $existing = $null
+    try {
+        $existing = Get-Process -Name $procName -ErrorAction SilentlyContinue |
+            Where-Object {
+                try {
+                    $_.Path -and [string]::Equals($_.Path, $resolvedExe, [System.StringComparison]::OrdinalIgnoreCase)
+                }
+                catch { $false }
+            } |
+            Select-Object -First 1
+    } catch { }
+
+    if ($null -ne $existing -and -not $existing.HasExited) {
+        $script:TrayProcess = $existing
+        $script:StartedTrayHere = $false
+        Write-Host "  [tray] Already running (PID $($existing.Id)); reusing existing tray process." -ForegroundColor DarkGray
+        return
+    }
+
     Write-Host '  [tray] Starting RoboExtension tray process...' -ForegroundColor DarkGray
     $script:TrayProcess = Start-Process $exe -PassThru -WindowStyle Hidden
+    $script:StartedTrayHere = $true
+
     # Poll the named pipe until the server is ready (up to 10 s).
     $pipeName  = 'RoboExtension_IPC'
     $deadline  = [DateTime]::UtcNow.AddSeconds(10)
@@ -645,13 +1101,16 @@ function Start-RoboExtensionTray([string]$exe) {
             $pipe.Dispose()
             $connected = $true
             break
-        } catch { Start-Sleep -Milliseconds 200 }
+        }
+        catch { Start-Sleep -Milliseconds 200 }
     }
+
     if (-not $connected) {
         Write-Warning '[tray] Pipe not ready after 10s -- cold-start fallback active.'
         return
     }
-    # Warm-up run: delete an empty temp dir to trigger JIT of the hot paths.
+
+    # Warm-up run: delete an empty temp dir to trigger JIT of hot paths.
     $tmp = Join-Path $env:TEMP ("re_warmup_$(Get-Random)")
     New-Item -ItemType Directory -Path $tmp -Force | Out-Null
     $p = Start-Process $exe -ArgumentList @('delete', "`"$tmp`"", '--f', '--yes') -PassThru -WindowStyle Hidden
@@ -661,15 +1120,18 @@ function Start-RoboExtensionTray([string]$exe) {
 }
 
 function Stop-RoboExtensionTray {
-    if ($null -ne $script:TrayProcess -and -not $script:TrayProcess.HasExited) {
+    if ($null -ne $script:TrayProcess -and -not $script:TrayProcess.HasExited -and $script:StartedTrayHere) {
         Write-Host "  [tray] Stopping tray process (PID $($script:TrayProcess.Id))..." -ForegroundColor DarkGray
         try { $script:TrayProcess.Kill() } catch {}
         $script:TrayProcess.WaitForExit(5000) | Out-Null
+    } elseif ($null -ne $script:TrayProcess -and -not $script:TrayProcess.HasExited) {
+        Write-Host "  [tray] Leaving existing tray process running (PID $($script:TrayProcess.Id))." -ForegroundColor DarkGray
     }
     $script:TrayProcess = $null
+    $script:StartedTrayHere = $false
 }
 
-if ($Mode -ne 'copy') {
+if ($runDelete) {
 # ---------------------------------------------------------------------------
 # Delete benchmark loop (SSD + HDD when available)
 # ---------------------------------------------------------------------------
@@ -681,9 +1143,23 @@ if ($HddPath) { $deleteCombos.Add([pscustomobject]@{ Label='HDD (delete)'; Path=
 
 # Start the tray process so RE delegations skip cold-start
 $reInDeleteList = $deleteToolList.Keys | Where-Object { $_ -like '*RoboExtension*' }
-if ($reInDeleteList) { Start-RoboExtensionTray $roboExePath }
+if ($reInDeleteList) {
+    if ($null -ne $script:TrayProcess -and -not $script:TrayProcess.HasExited) {
+        Write-Host "  [tray] Reusing tray process for delete benchmark (PID $($script:TrayProcess.Id))." -ForegroundColor DarkGray
+    }
+    else {
+        Start-RoboExtensionTray $roboExePath
+    }
+}
 try {
 foreach ($dc in $deleteCombos) {
+    if ($ComboFilter) {
+        $tokens  = $ComboFilter -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+        $matched = $false
+        foreach ($tok in $tokens) { if ($dc.Label -like "*$tok*") { $matched = $true; break } }
+        if (-not $matched) { continue }
+    }
+
     Write-Host ("`n`n=== DELETE BENCHMARK ({0}) - Permanent Delete ===" -f $dc.Label.Split(' ')[0]) -ForegroundColor Cyan
 
     foreach ($sc in $scenarioMeta) {
@@ -694,43 +1170,78 @@ foreach ($dc in $deleteCombos) {
 
         Write-Host ("`n--- {0} ---" -f $sc.Label) -ForegroundColor Yellow
 
-        foreach ($kv in $deleteToolList.GetEnumerator()) {
-            $toolName = $kv.Key
-            $toolMeta = $kv.Value
+        # Order-balanced: rotate which tool runs first each round.
+        $toolEntries = @($deleteToolList.GetEnumerator())
+        $timesByTool = @{}
+        $errorByTool = @{}
+        foreach ($kv in $toolEntries) {
+            $timesByTool[$kv.Key] = [System.Collections.Generic.List[double]]::new()
+            $errorByTool[$kv.Key] = $false
+        }
+        $toolColWidth = 34
 
-            Write-Host ("  {0,-38}" -f $toolName) -NoNewline -ForegroundColor White
+        for ($run = 1; $run -le $Runs; $run++) {
+            $count = $toolEntries.Count
+            if ($count -eq 0) { break }
+            $shift = ($run - 1) % $count
+            if ($count -eq 1) {
+                $runOrder = @($toolEntries[0])
+            } elseif ($shift -eq 0) {
+                $runOrder = @($toolEntries)
+            } else {
+                $runOrder = @($toolEntries[$shift..($count - 1)] + $toolEntries[0..($shift - 1)])
+            }
 
-            $times   = [System.Collections.Generic.List[double]]::new()
-            $errored = $false
+            if ($run -gt 1) { Write-Host "" }
 
-            for ($run = 1; $run -le $Runs; $run++) {
-                Write-Host "[$run]" -NoNewline -ForegroundColor DarkGray
+            foreach ($kv in $runOrder) {
+                $toolName = $kv.Key
+                if ($errorByTool[$toolName]) { continue }
+                $toolMeta = $kv.Value
                 try {
                     $t = Measure-Delete $toolMeta.Id $toolMeta.Exe $srcDir $dc.Path
-                    $times.Add($t)
-                    Write-Host (" {0:F1}s" -f $t) -NoNewline -ForegroundColor Gray
+                    $timesByTool[$toolName].Add($t)
+                    Write-Host ("  [{0}] {1,-$toolColWidth} {2,6:F1}s" -f $run, $toolName, $t) -ForegroundColor DarkGray
                 } catch {
-                    Write-Host " ERR" -NoNewline -ForegroundColor Red
-                    Write-Host (" ($_)") -ForegroundColor DarkRed
-                    $errored = $true
-                    break
+                    Write-Host ("  [{0}] {1,-$toolColWidth} ERR ({2})" -f $run, $toolName, $_) -ForegroundColor Red
+                    $errorByTool[$toolName] = $true
                 }
             }
+        }
 
-            if (-not $errored) {
-                $med = Median($times.ToArray())
-                Write-Host ("  -> {0}" -f (Format-Secs $med)) -ForegroundColor Cyan
-                $deleteResults.Add([pscustomobject]@{
-                    Scenario   = $sc.Label
-                    Storage    = $dc.Label
-                    Tool       = $toolName
-                    Files      = $files
-                    TotalMB    = [Math]::Round($bytes / 1MB, 1)
-                    MedianSec  = [Math]::Round($med, 2)
-                    MBps       = 'N/A'
-                    AllRunsSec = ($times | ForEach-Object { [Math]::Round($_, 2) }) -join ','
-                })
+        foreach ($kv in $toolEntries) {
+            $toolName = $kv.Key
+            $times    = $timesByTool[$toolName]
+            $errored  = $errorByTool[$toolName]
+
+            if ($errored -or $times.Count -eq 0) {
+                Write-Host ("  {0,-38} ERR" -f $toolName) -ForegroundColor Red
+                continue
             }
+
+            $parts = @()
+            for ($i = 0; $i -lt $times.Count; $i++) {
+                $parts += ("[{0}] {1,5:F1}s" -f ($i + 1), $times[$i])
+            }
+            $runText = $parts -join ' '
+            $runTextPadded = $runText.PadRight([Math]::Max(28, $Runs * 12))
+
+            $med = Median($times.ToArray())
+            Write-Host ("  {0,-$toolColWidth}" -f $toolName) -NoNewline -ForegroundColor White
+            Write-Host (" {0}" -f $runTextPadded) -NoNewline -ForegroundColor Gray
+            Write-Host ("  -> {0,6:F1}s" -f $med) -ForegroundColor Cyan
+
+            $deleteResults.Add([pscustomobject]@{
+                Operation  = 'delete-permanent'
+                Scenario   = $sc.Label
+                Storage    = $dc.Label
+                Tool       = $toolName
+                Files      = $files
+                TotalMB    = [Math]::Round($bytes / 1MB, 1)
+                MedianSec  = [Math]::Round($med, 2)
+                MBps       = 'N/A'
+                AllRunsSec = ($times | ForEach-Object { [Math]::Round($_, 2) }) -join ','
+            })
         }
     }
 }
@@ -738,7 +1249,294 @@ $allResults.AddRange($deleteResults)
 } finally {
     if ($reInDeleteList) { Stop-RoboExtensionTray }
 }
-} # end if ($Mode -ne 'copy')
+} # end if ($runDelete)
+
+if ($runRecycle) {
+# ---------------------------------------------------------------------------
+# Recycle-bin delete benchmark loop (SSD + HDD when available)
+# ---------------------------------------------------------------------------
+$recycleResults = [System.Collections.Generic.List[pscustomobject]]::new()
+
+$recycleCombos = [System.Collections.Generic.List[pscustomobject]]::new()
+$recycleCombos.Add([pscustomobject]@{ Label='SSD (recycle)'; Path=$SsdPath })
+if ($HddPath) { $recycleCombos.Add([pscustomobject]@{ Label='HDD (recycle)'; Path=$HddPath }) }
+
+$reInRecycleList = $recycleToolList.Keys | Where-Object { $_ -like '*RoboExtension*' }
+if ($reInRecycleList) {
+    if ($null -ne $script:TrayProcess -and -not $script:TrayProcess.HasExited) {
+        Write-Host "  [tray] Reusing tray process for recycle benchmark (PID $($script:TrayProcess.Id))." -ForegroundColor DarkGray
+    }
+    else {
+        Start-RoboExtensionTray $roboExePath
+    }
+}
+try {
+foreach ($rc in $recycleCombos) {
+    if ($ComboFilter) {
+        $tokens  = $ComboFilter -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+        $matched = $false
+        foreach ($tok in $tokens) { if ($rc.Label -like "*$tok*") { $matched = $true; break } }
+        if (-not $matched) { continue }
+    }
+
+    Write-Host ("`n`n=== DELETE BENCHMARK ({0}) - Recycle Bin ===" -f $rc.Label.Split(' ')[0]) -ForegroundColor Cyan
+
+    foreach ($sc in $scenarioMeta) {
+        if ($ScenarioFilter -and $sc.Name -notlike "*$ScenarioFilter*") { continue }
+        $srcDir = Join-Path $rc.Path "src\$($sc.Name)"
+        $bytes  = $scenBytes[$sc.Name]
+        $files  = @(Get-ChildItem -LiteralPath $srcDir -Recurse -File).Count
+
+        Write-Host ("`n--- {0} ---" -f $sc.Label) -ForegroundColor Yellow
+
+        $toolEntries = @($recycleToolList.GetEnumerator())
+        $timesByTool = @{}
+        $errorByTool = @{}
+        foreach ($kv in $toolEntries) {
+            $timesByTool[$kv.Key] = [System.Collections.Generic.List[double]]::new()
+            $errorByTool[$kv.Key] = $false
+        }
+        $toolColWidth = 34
+
+        for ($run = 1; $run -le $Runs; $run++) {
+            $count = $toolEntries.Count
+            if ($count -eq 0) { break }
+            $shift = ($run - 1) % $count
+            if ($count -eq 1) {
+                $runOrder = @($toolEntries[0])
+            } elseif ($shift -eq 0) {
+                $runOrder = @($toolEntries)
+            } else {
+                $runOrder = @($toolEntries[$shift..($count - 1)] + $toolEntries[0..($shift - 1)])
+            }
+
+            if ($run -gt 1) { Write-Host "" }
+
+            foreach ($kv in $runOrder) {
+                $toolName = $kv.Key
+                if ($errorByTool[$toolName]) { continue }
+                $toolMeta = $kv.Value
+                try {
+                    $t = Measure-RecycleDelete $toolMeta.Id $toolMeta.Exe $srcDir $rc.Path
+                    $timesByTool[$toolName].Add($t)
+                    Write-Host ("  [{0}] {1,-$toolColWidth} {2,6:F1}s" -f $run, $toolName, $t) -ForegroundColor DarkGray
+                } catch {
+                    Write-Host ("  [{0}] {1,-$toolColWidth} ERR ({2})" -f $run, $toolName, $_) -ForegroundColor Red
+                    $errorByTool[$toolName] = $true
+                }
+            }
+        }
+
+        foreach ($kv in $toolEntries) {
+            $toolName = $kv.Key
+            $times    = $timesByTool[$toolName]
+            $errored  = $errorByTool[$toolName]
+
+            if ($errored -or $times.Count -eq 0) {
+                Write-Host ("  {0,-38} ERR" -f $toolName) -ForegroundColor Red
+                continue
+            }
+
+            $parts = @()
+            for ($i = 0; $i -lt $times.Count; $i++) {
+                $parts += ("[{0}] {1,5:F1}s" -f ($i + 1), $times[$i])
+            }
+            $runText = $parts -join ' '
+            $runTextPadded = $runText.PadRight([Math]::Max(28, $Runs * 12))
+
+            $med = Median($times.ToArray())
+            Write-Host ("  {0,-$toolColWidth}" -f $toolName) -NoNewline -ForegroundColor White
+            Write-Host (" {0}" -f $runTextPadded) -NoNewline -ForegroundColor Gray
+            Write-Host ("  -> {0,6:F1}s" -f $med) -ForegroundColor Cyan
+
+            $recycleResults.Add([pscustomobject]@{
+                Operation  = 'delete-recycle'
+                Scenario   = $sc.Label
+                Storage    = $rc.Label
+                Tool       = $toolName
+                Files      = $files
+                TotalMB    = [Math]::Round($bytes / 1MB, 1)
+                MedianSec  = [Math]::Round($med, 2)
+                MBps       = 'N/A'
+                AllRunsSec = ($times | ForEach-Object { [Math]::Round($_, 2) }) -join ','
+            })
+        }
+    }
+}
+$allResults.AddRange($recycleResults)
+} finally {
+    if ($reInRecycleList) { Stop-RoboExtensionTray }
+}
+} # end if ($runRecycle)
+
+# ---------------------------------------------------------------------------
+# WSL copy benchmark (WSL->WSL / WSL->SSD / WSL->HDD, when -WslSource is provided)
+# ---------------------------------------------------------------------------
+if ($WslSource) {
+    $wslSrc = $WslSource.TrimEnd('\')
+    $isWslPath = $wslSrc -match '^\\\\wsl[.$\\]'
+    if (-not $isWslPath) {
+        Write-Warning "WslSource '$wslSrc' does not look like a WSL UNC path. Expected \\\\wsl.localhost\\... or \\\\wsl`$\\.... Skipping."
+    } else {
+        if ($ForceRegen -and (Test-Path -LiteralPath $wslSrc -ErrorAction SilentlyContinue)) {
+            Write-Host "`n[DATA] -ForceRegen: removing existing WSL dataset at $wslSrc" -ForegroundColor DarkYellow
+            Remove-Item -LiteralPath $wslSrc -Recurse -Force
+        }
+        if (-not (Test-Path -LiteralPath $wslSrc -ErrorAction SilentlyContinue)) {
+            Write-Host "`n[DATA] WSL source not found - auto-generating mixed dataset at:" -ForegroundColor Cyan
+            Write-Host "  $wslSrc" -ForegroundColor Gray
+            New-Item -ItemType Directory -Path $wslSrc -Force | Out-Null
+            $rng   = [System.Random]::new(42)
+            $sizes = @(4KB, 8KB, 16KB, 32KB, 64KB, 128KB, 256KB, 512KB, 1MB, 2MB, 5MB, 10MB)
+            for ($i = 1; $i -le 3000; $i++) {
+                Write-TestFile (Join-Path $wslSrc "f$i.dat") $sizes[$rng.Next($sizes.Length)]
+            }
+            Write-Host "  Generated 3000 mixed files (4 KB - 10 MB)" -ForegroundColor Green
+        } else {
+            Write-Host "`n[DATA] WSL source: $wslSrc (use -ForceRegen to rebuild)" -ForegroundColor DarkGray
+        }
+        $wslDiskInfo = Get-WslVhdxInfo $wslSrc
+        $wslDiskLabel = if ($wslDiskInfo) { $wslDiskInfo.Label } else { 'unknown' }
+        # Build WSL destination scenarios: WSL->WSL (same VHDX), WSL->SSD, WSL->HDD
+        $wslDistro = ($wslSrc.TrimStart('\') -split '\\')[1]
+        $wslDestScenarios = [ordered]@{}
+        $wslDestScenarios['WSL->WSL'] = [pscustomobject]@{
+            DstRoot      = "\\wsl.localhost\$wslDistro\tmp\__bench_dst"
+            StorageLabel = "WSL(VHDX on $wslDiskLabel)->WSL(VHDX on $wslDiskLabel)"
+        }
+        if ($SsdPath) {
+            $wslDestScenarios['WSL->SSD'] = [pscustomobject]@{
+                DstRoot      = Join-Path $SsdPath 'wsl_dst'
+                StorageLabel = "WSL(VHDX on $wslDiskLabel)->SSD"
+            }
+        }
+        if ($HddPath) {
+            $wslDestScenarios['WSL->HDD'] = [pscustomobject]@{
+                DstRoot      = Join-Path $HddPath 'wsl_dst'
+                StorageLabel = "WSL(VHDX on $wslDiskLabel)->HDD"
+            }
+        }
+
+        Write-Host "  Source : $wslSrc" -ForegroundColor Gray
+        if ($wslDiskInfo) {
+            Write-Host "  VHDX   : drive $($wslDiskInfo.DriveLetter): ($($wslDiskInfo.Label))" -ForegroundColor Gray
+        } else {
+            Write-Host "  VHDX   : drive unknown (registry miss - defaulting to SSD behavior)" -ForegroundColor DarkYellow
+        }
+
+        Write-Host "  Counting source files..." -NoNewline -ForegroundColor Gray
+        $wslFileList  = @(Get-ChildItem -LiteralPath $wslSrc -Recurse -File -ErrorAction SilentlyContinue)
+        $wslFileCount = $wslFileList.Count
+        $wslBytes     = [long]($wslFileList | Measure-Object -Property Length -Sum).Sum
+        Write-Host " $wslFileCount files  $([Math]::Round($wslBytes/1MB,0)) MB" -ForegroundColor Green
+
+        $wslScenarioLabel = "WSL real-world ($([System.IO.Path]::GetFileName($wslSrc)))"
+
+        # All detected tools (Explorer, Robocopy, RoboExtension, TeraCopy, FastCopy)
+        # - same list as main copy benchmark, ToolFilter already applied
+        # - any tool that can't handle WSL UNC paths will show ERR in results
+        $wslToolList = $toolList
+
+        $reInWslList = $wslToolList.Keys | Where-Object { $_ -like '*RoboExtension*' }
+        if ($reInWslList) {
+            if ($null -ne $script:TrayProcess -and -not $script:TrayProcess.HasExited) {
+                Write-Host "  [tray] Reusing tray process for WSL benchmark (PID $($script:TrayProcess.Id))." -ForegroundColor DarkGray
+            } else {
+                Start-RoboExtensionTray $roboExePath
+            }
+        }
+
+        $toolEntries  = @($wslToolList.GetEnumerator())
+        $toolColWidth = 34
+
+        try {
+            foreach ($destKv in $wslDestScenarios.GetEnumerator()) {
+                $wslStorageLabel = $destKv.Value.StorageLabel
+                $wslDstRoot      = $destKv.Value.DstRoot
+
+                Write-Host "`n`n=== WSL COPY BENCHMARK ($wslStorageLabel) ===" -ForegroundColor Cyan
+                Write-Host "  Source : $wslSrc" -ForegroundColor Gray
+                Write-Host "  Dest   : $wslDstRoot" -ForegroundColor Gray
+
+                $timesByTool = @{}
+                $errorByTool = @{}
+                foreach ($kv in $toolEntries) {
+                    $timesByTool[$kv.Key] = [System.Collections.Generic.List[double]]::new()
+                    $errorByTool[$kv.Key] = $false
+                }
+
+                for ($run = 1; $run -le $Runs; $run++) {
+                    $count = $toolEntries.Count
+                    if ($count -eq 0) { break }
+                    $shift = ($run - 1) % $count
+                    if ($count -eq 1) {
+                        $runOrder = @($toolEntries[0])
+                    } elseif ($shift -eq 0) {
+                        $runOrder = @($toolEntries)
+                    } else {
+                        $runOrder = @($toolEntries[$shift..($count - 1)] + $toolEntries[0..($shift - 1)])
+                    }
+
+                    if ($run -gt 1) { Write-Host "" }
+
+                    foreach ($kv in $runOrder) {
+                        $toolName = $kv.Key
+                        if ($errorByTool[$toolName]) { continue }
+                        $toolMeta = $kv.Value
+                        $dstDir   = Join-Path $wslDstRoot $toolMeta.Id
+                        try {
+                            $t = Measure-Tool $toolMeta.Id $toolMeta.Exe $wslSrc $dstDir
+                            $timesByTool[$toolName].Add($t)
+                            Write-Host ("  [{0}] {1,-$toolColWidth} {2,6:F1}s  {3,11}" -f $run, $toolName, $t, (Format-MBps $wslBytes $t)) -ForegroundColor DarkGray
+                        } catch {
+                            Write-Host ("  [{0}] {1,-$toolColWidth} ERR ({2})" -f $run, $toolName, $_) -ForegroundColor Red
+                            $errorByTool[$toolName] = $true
+                        }
+                    }
+                }
+
+                Write-Host ""
+                Write-Host "  Summary:" -ForegroundColor DarkGray
+                foreach ($kv in $toolEntries) {
+                    $toolName = $kv.Key
+                    $times    = $timesByTool[$toolName]
+                    $errored  = $errorByTool[$toolName]
+
+                    if ($errored -or $times.Count -eq 0) {
+                        Write-Host ("  {0,-38} ERR" -f $toolName) -ForegroundColor Red
+                        continue
+                    }
+
+                    $parts = @()
+                    for ($i = 0; $i -lt $times.Count; $i++) {
+                        $parts += ("[{0}] {1,5:F1}s" -f ($i + 1), $times[$i])
+                    }
+                    $runText       = $parts -join ' '
+                    $runTextPadded = $runText.PadRight([Math]::Max(28, $Runs * 12))
+
+                    $med = Median($times.ToArray())
+                    Write-Host ("  {0,-$toolColWidth}" -f $toolName) -NoNewline -ForegroundColor White
+                    Write-Host (" {0}" -f $runTextPadded) -NoNewline -ForegroundColor Gray
+                    Write-Host ("  -> {0,6:F1}s  {1,7:F1} MB/s" -f $med, ($wslBytes / $med / 1MB)) -ForegroundColor Cyan
+
+                    $allResults.Add([pscustomobject]@{
+                        Operation  = 'copy'
+                        Scenario   = $wslScenarioLabel
+                        Storage    = $wslStorageLabel
+                        Tool       = $toolName
+                        Files      = $wslFileCount
+                        TotalMB    = [Math]::Round($wslBytes / 1MB, 1)
+                        MedianSec  = [Math]::Round($med, 2)
+                        MBps       = [Math]::Round($wslBytes / $med / 1MB, 1)
+                        AllRunsSec = ($times | ForEach-Object { [Math]::Round($_, 2) }) -join ','
+                    })
+                }
+            } # end foreach destination
+        } finally {
+            if ($reInWslList -and $script:StartedTrayHere) { Stop-RoboExtensionTray }
+        }
+    }
+}
 
 # ---------------------------------------------------------------------------
 # Summary table
@@ -747,6 +1545,7 @@ Write-Host ("`n`n{0}" -f ('=' * 80)) -ForegroundColor Green
 Write-Host "  BENCHMARK RESULTS (black-box) - median of $Runs runs" -ForegroundColor Green
 Write-Host ('=' * 80) -ForegroundColor Green
 $allResults | Format-Table `
+    @{ L='Operation';E={ $_.Operation }; W=18 },
     @{ L='Storage';  E={ $_.Storage  }; W=10 },
     @{ L='Scenario'; E={ $_.Scenario }; W=42 },
     @{ L='Tool';     E={ $_.Tool     }; W=38 },
