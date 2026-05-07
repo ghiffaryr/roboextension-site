@@ -1054,9 +1054,8 @@
   <section class="hero">
     <div class="hero-icon">R</div>
     <h1>RoboExtension</h1>
-    <p class="tagline">Copy files <strong>10&times; faster than Windows Explorer</strong> — directly from the
-      right-click menu,
-      with real-time progress, automatic retry, and SSD-optimized multi-threading.</p>
+    <p class="tagline">Copy files <strong>10&times; faster than Windows Explorer</strong> — with real-time progress,
+      automatic retry, and SSD-optimized multi-threading.</p>
     <div class="badge-row">
       <span class="badge">Windows 10 / 11 (64-bit)</span>
       <span class="badge">SSD and HDD support</span>
@@ -1160,13 +1159,23 @@
       <div class="feat-card">
         <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg></div>
+        <h3>SHA-256 Verification</h3>
+        <p>Optionally re-reads every destination file after the copy completes and compares SHA-256 hashes against the
+          source. Any mismatch is flagged with a one-click re-copy. Useful when archiving originals, migrating drives,
+          or copying across a network you don&rsquo;t fully trust.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <rect x="6" y="2" width="12" height="20" rx="6" />
             <line x1="12" y1="2" x2="12" y2="9" />
             <line x1="6" y1="9" x2="18" y2="9" />
           </svg></div>
-        <h3>Context Menu Integration</h3>
-        <p>Quick Cut, Quick Copy, Quick Paste, and Quick Delete are added directly to the Windows Explorer right-click
-          menu. Copy and move use an adaptive engine that automatically selects the optimal transfer path. Delete
+        <h3>Keyboard Shortcut Integration</h3>
+        <p>Copy, cut, paste, and delete are intercepted directly from your existing Explorer keyboard shortcuts. Copy
+          and move use an adaptive engine that automatically selects the optimal transfer path. Delete
           processes the file tree efficiently in bulk, which is significantly faster than Explorer on large file counts.
         </p>
       </div>
@@ -1203,7 +1212,8 @@
         <p>Windows Explorer silently drops files when copying WSL paths that contain Linux directory symlinks,
           producing an incomplete result with no error. RoboExtension resolves every symlink target through WSL's own
           path resolver before scanning, so the full tree is copied correctly. Particularly useful for pnpm
-          <code>node_modules</code> inside WSL, where deep symlink graphs are the norm.</p>
+          <code>node_modules</code> inside WSL, where deep symlink graphs are the norm.
+        </p>
       </div>
     </div>
   </section>
@@ -1218,13 +1228,12 @@
       <div class="step">
         <div class="step-num">1</div>
         <h3>Run the installer</h3>
-        <p>The setup wizard registers the right-click context menu entries and optionally configures RoboExtension to
-          start with Windows.</p>
+        <p>The setup wizard optionally configures RoboExtension to start with Windows.</p>
       </div>
       <div class="step">
         <div class="step-num">2</div>
         <h3>Use Windows Explorer as normal</h3>
-        <p>Keyboard shortcuts and right-click menu entries work exactly as before. RoboExtension intercepts the
+        <p>Keyboard shortcuts work exactly as before. RoboExtension intercepts the
           operations and routes copies and moves through a proprietary adaptive engine tuned for real-world Windows
           workloads.</p>
       </div>
@@ -1306,31 +1315,6 @@
               <button class="win-btn">Skip</button>
               <button class="win-btn">Cancel All</button>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="demo-card">
-        <div class="demo-card-label">Explorer Right-Click Menu</div>
-        <div class="ctx-wrap">
-          <div class="ctx-menu">
-            <div class="ctx-item ctx-open">Open</div>
-            <div class="ctx-item">Open with&hellip;</div>
-            <div class="ctx-sep"></div>
-            <div class="ctx-item"><span class="ctx-app-ico">R</span> Quick Cut</div>
-            <div class="ctx-item"><span class="ctx-app-ico">R</span> Quick Copy</div>
-            <div class="ctx-item"><span class="ctx-app-ico">R</span> Quick Delete</div>
-            <div class="ctx-sep"></div>
-            <div class="ctx-item"><span class="ctx-ico">&#xE8C8;</span> Copy as path</div>
-            <div class="ctx-item"><span class="ctx-ico">&#xE72D;</span> Share</div>
-            <div class="ctx-sep"></div>
-            <div class="ctx-item">Cut</div>
-            <div class="ctx-item">Copy</div>
-            <div class="ctx-sep"></div>
-            <div class="ctx-item">Delete</div>
-            <div class="ctx-item">Rename</div>
-            <div class="ctx-sep"></div>
-            <div class="ctx-item">Properties</div>
           </div>
         </div>
       </div>
