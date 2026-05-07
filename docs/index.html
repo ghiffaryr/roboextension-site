@@ -1419,6 +1419,65 @@
         </div>
       </div>
 
+      <div class="demo-card">
+        <div class="demo-card-label">Verification Results</div>
+        <div class="win-mock">
+          <div class="win-titlebar">
+            <div class="win-titlebar-left">
+              <div class="win-app-icon">R</div>
+              <span>RoboExtension &#8212; Verification Results</span>
+            </div>
+            <div class="win-titlebar-btns">
+              <span class="win-ctrl close">&#10005;</span>
+            </div>
+          </div>
+          <div class="win-body">
+            <div class="win-lbl" style="margin-bottom:4px;color:#dc5040">4 files passed, 1 failed.</div>
+            <div class="win-lbl" style="margin-bottom:10px;color:#646464">Hover a row to see the full source and destination paths.</div>
+            <table style="width:100%;border-collapse:collapse;border:1px solid #ccc;font-size:11px;margin-bottom:10px">
+              <thead>
+                <tr style="background:#f0f0f0;border-bottom:1px solid #ccc">
+                  <th style="text-align:left;padding:4px 8px;font-weight:600;width:55%;border-right:1px solid #ccc">File</th>
+                  <th style="text-align:left;padding:4px 8px;font-weight:600;width:14%;border-right:1px solid #ccc">Status</th>
+                  <th style="text-align:left;padding:4px 8px;font-weight:600">Error</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid #e8e8e8">
+                  <td style="padding:4px 8px;color:#dc5040;border-right:1px solid #e8e8e8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0">...backup\project\dist\app.js</td>
+                  <td style="padding:4px 8px;color:#dc5040;border-right:1px solid #e8e8e8;white-space:nowrap">Fail</td>
+                  <td style="padding:4px 8px;color:#dc5040;white-space:nowrap">SHA-256 mismatch</td>
+                </tr>
+                <tr style="border-bottom:1px solid #e8e8e8">
+                  <td style="padding:4px 8px;color:#333;border-right:1px solid #e8e8e8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0">...backup\project\src\index.ts</td>
+                  <td style="padding:4px 8px;color:#333;border-right:1px solid #e8e8e8;white-space:nowrap">Pass</td>
+                  <td style="padding:4px 8px;color:#333"></td>
+                </tr>
+                <tr style="border-bottom:1px solid #e8e8e8">
+                  <td style="padding:4px 8px;color:#333;border-right:1px solid #e8e8e8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0">...backup\project\src\utils.ts</td>
+                  <td style="padding:4px 8px;color:#333;border-right:1px solid #e8e8e8;white-space:nowrap">Pass</td>
+                  <td style="padding:4px 8px;color:#333"></td>
+                </tr>
+                <tr style="border-bottom:1px solid #e8e8e8">
+                  <td style="padding:4px 8px;color:#333;border-right:1px solid #e8e8e8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0">...backup\project\package.json</td>
+                  <td style="padding:4px 8px;color:#333;border-right:1px solid #e8e8e8;white-space:nowrap">Pass</td>
+                  <td style="padding:4px 8px;color:#333"></td>
+                </tr>
+                <tr>
+                  <td style="padding:4px 8px;color:#333;border-right:1px solid #e8e8e8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0">...backup\project\README.md</td>
+                  <td style="padding:4px 8px;color:#333;border-right:1px solid #e8e8e8;white-space:nowrap">Pass</td>
+                  <td style="padding:4px 8px;color:#333"></td>
+                </tr>
+              </tbody>
+            </table>
+            <div style="display:flex;justify-content:space-between;gap:6px">
+              <button class="win-btn" style="width:46%;justify-content:center">Recopy Failed Files</button>
+              <button class="win-btn" style="width:30%;justify-content:center">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
